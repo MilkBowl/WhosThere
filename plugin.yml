@@ -1,3 +1,4 @@
 name: MemManager
 main: com.sleaker.MemManager.MemManager
+author: Sleaker
 version: 0.2.0
