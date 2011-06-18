@@ -1,4 +1,4 @@
 name: MemManager
-main: com.sleaker.MemManager.MemManager
+main: com.sleaker.WhosThere.WhosThere
 author: Sleaker
-version: 0.2.0
+version: 1.0
