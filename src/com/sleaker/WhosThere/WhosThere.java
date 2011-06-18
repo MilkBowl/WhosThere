@@ -11,7 +11,6 @@ import net.milkbowl.admintoggle.PlayerInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -62,9 +61,9 @@ public class WhosThere extends JavaPlugin{
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if (command.getName().equalsIgnoreCase("who")) {
             if (sender instanceof Player) {
-                if (!check(sender, "whosthere.who")) {
+                if (!Permissions.has((Player) sender, "whosthere.who")) {
                     return false;
-                } else if (!check(sender, "whosthere.showall") && admins != null && !showStealthed) {
+                } else if (!Permissions.has((Player) sender, "whosthere.showall") && admins != null && !showStealthed) {
                     whoLimited(sender);
                 } else {
                     whoUnlimited(sender);
@@ -114,19 +113,6 @@ public class WhosThere extends JavaPlugin{
         }
     }
 
-    //Permission Checker
-    public boolean check(CommandSender sender, String permNode) {
-        if (sender instanceof Player) {
-            if (Permissions == null) {
-                return sender.isOp();
-            } else {
-                return Permissions.has((Player) sender, permNode);
-            }
-        }
-        else  
-            return (sender instanceof ConsoleCommandSender);
-    }
-
     /*
      * Gets a Permissions Prefix
      */
@@ -154,7 +140,8 @@ public class WhosThere extends JavaPlugin{
             playerList += player.getName() + ChatColor.WHITE + " ";
             i++;
         }
-        String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online: " + playerList;
+        String message = "";
+        message += ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online: " + playerList;
         sender.sendMessage(message);
     }
 
