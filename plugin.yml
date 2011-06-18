@@ -1,4 +1,8 @@
-name: MemManager
+name: WhosThere
 main: com.sleaker.WhosThere.WhosThere
 author: Sleaker
 version: 1.0
+commands:
+    who:
+        aliases: [ list, players, online, playerlist]
+        description: lists online players
