@@ -61,9 +61,10 @@ public class WhosThere extends JavaPlugin{
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if (command.getName().equalsIgnoreCase("who")) {
             if (sender instanceof Player) {
-                if (!Permissions.has((Player) sender, "whosthere.who")) {
+                Player player = (Player) sender;
+                if (!Permissions.has(player, "whosthere.who")) {
                     return false;
-                } else if (!Permissions.has((Player) sender, "whosthere.showall") && admins != null && !showStealthed) {
+                } else if (!Permissions.has(player, "whosthere.showall") && admins != null && !showStealthed) {
                     whoLimited(sender);
                 } else {
                     whoUnlimited(sender);
@@ -106,6 +107,7 @@ public class WhosThere extends JavaPlugin{
                     this.getServer().getPluginManager().enablePlugin(perms);
 
                 Permissions = ((Permissions) perms).getHandler();
+                log.info(plugName + " - Successfully hooked into Permissions v" + perms.getDescription().getVersion());
             } else {
                 log.info("[" + getDescription().getName() + "] Permissions not detected - disabling plugin");
                 this.getServer().getPluginManager().disablePlugin(this);
@@ -119,7 +121,7 @@ public class WhosThere extends JavaPlugin{
     public String prefix(Player player) {
         //Return Null if Permissions didn't load or if usePrefix is false
         if (Permissions == null || !usePrefix) 
-            return null;
+            return null;        
         else
             return Permissions.getGroupPrefix(player.getWorld().getName(), Permissions.getGroup(player.getWorld().getName(), player.getName()));
     }
@@ -140,8 +142,7 @@ public class WhosThere extends JavaPlugin{
             playerList += player.getName() + ChatColor.WHITE + " ";
             i++;
         }
-        String message = "";
-        message += ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online: " + playerList;
+        String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online: " + playerList;
         sender.sendMessage(message);
     }
 
