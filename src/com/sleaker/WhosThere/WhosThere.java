@@ -2,11 +2,9 @@ package com.sleaker.WhosThere;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import net.milkbowl.admintoggle.AdminToggle;
-import net.milkbowl.admintoggle.PlayerInfo;
+import net.milkbowl.administrate.AdminHandler;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -27,7 +25,7 @@ public class WhosThere extends JavaPlugin{
     public static Logger log = Logger.getLogger("Minecraft");
     public static final String plugName = "[WhosThere]"; 
     public static PermissionHandler Permissions = null;
-    public Map<String, PlayerInfo> admins = null;
+    public AdminHandler admins = null;
     private boolean usePrefix = true;
     private boolean showStealthed = false;
 
@@ -57,6 +55,7 @@ public class WhosThere extends JavaPlugin{
         log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
 
     }
+    
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if (command.getName().equalsIgnoreCase("who")) {
@@ -89,12 +88,12 @@ public class WhosThere extends JavaPlugin{
     }
     public void setupOptionals() {
         if (admins == null) {
-            Plugin aT = this.getServer().getPluginManager().getPlugin("AdminToggle");
-            if (aT != null) {
-                if (!this.getServer().getPluginManager().isPluginEnabled("AdminToggle")){
-                    this.getServer().getPluginManager().enablePlugin(aT);
+            Plugin admin = this.getServer().getPluginManager().getPlugin("Administrate");
+            if (admin != null) {
+                if (!this.getServer().getPluginManager().isPluginEnabled("Administrate")){
+                    this.getServer().getPluginManager().enablePlugin(admin);
                 }
-                admins = ((AdminToggle) aT).getPlayerInfo();
+                admins = new AdminHandler();
             }
         } 
     }
@@ -139,10 +138,10 @@ public class WhosThere extends JavaPlugin{
             if (usePrefix) {
                 playerList += prefix(player);
             }
-            playerList += player.getName() + ChatColor.WHITE + " ";
+            playerList += player.getName() + ChatColor.WHITE + "  ";
             i++;
         }
-        String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online: " + playerList;
+        String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
         sender.sendMessage(message);
     }
 
@@ -151,12 +150,12 @@ public class WhosThere extends JavaPlugin{
      * 
      */
     private void whoUnlimited(CommandSender sender) {
-        String playerList = ChatColor.WHITE + "There are " + ChatColor.BLUE + getServer().getOnlinePlayers().length + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online: ";
+        String playerList = ChatColor.WHITE + "There are " + ChatColor.BLUE + getServer().getOnlinePlayers().length + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  ";
         for (Player player : getServer().getOnlinePlayers()) {
             if (usePrefix) {
                 playerList += prefix(player);
             }
-            playerList += player.getName() + ChatColor.WHITE + " ";
+            playerList += player.getName() + ChatColor.WHITE + "  ";
         }
         sender.sendMessage(playerList);
     }
@@ -168,10 +167,8 @@ public class WhosThere extends JavaPlugin{
     public boolean isStealthed(String player) {
         if (admins == null)
             return false;
-        else if (admins.containsKey(player))
-            return admins.get(player).isStealthed();
         else
-            return false;
+            return admins.isStealthed(player);
     }
 
 }
