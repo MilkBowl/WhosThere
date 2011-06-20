@@ -94,6 +94,7 @@ public class WhosThere extends JavaPlugin{
                     this.getServer().getPluginManager().enablePlugin(admin);
                 }
                 admins = new AdminHandler();
+                log.info(plugName + " - Successfully hooked into Administrate v" + admin.getDescription().getVersion());
             }
         } 
     }
