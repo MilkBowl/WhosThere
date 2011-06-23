@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.milkbowl.administrate.AdminHandler;
+import net.milkbowl.administrate.Administrate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -93,7 +94,7 @@ public class WhosThere extends JavaPlugin{
                 if (!this.getServer().getPluginManager().isPluginEnabled("Administrate")){
                     this.getServer().getPluginManager().enablePlugin(admin);
                 }
-                admins = new AdminHandler();
+                admins = ((Administrate) admin).getAdminHandler();
                 log.info(plugName + " - Successfully hooked into Administrate v" + admin.getDescription().getVersion());
             }
         } 
@@ -169,7 +170,7 @@ public class WhosThere extends JavaPlugin{
         if (admins == null)
             return false;
         else
-            return admins.isStealthed(player);
+            return AdminHandler.isStealthed(player);
     }
 
 }
