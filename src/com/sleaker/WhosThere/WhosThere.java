@@ -87,13 +87,11 @@ public class WhosThere extends JavaPlugin{
         config.save();
 
     }
+    
     public void setupOptionals() {
         if (admins == null) {
             Plugin admin = this.getServer().getPluginManager().getPlugin("Administrate");
             if (admin != null) {
-                if (!this.getServer().getPluginManager().isPluginEnabled("Administrate")){
-                    this.getServer().getPluginManager().enablePlugin(admin);
-                }
                 admins = ((Administrate) admin).getAdminHandler();
                 log.info(plugName + " - Successfully hooked into Administrate v" + admin.getDescription().getVersion());
             }
