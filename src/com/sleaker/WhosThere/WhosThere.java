@@ -16,159 +16,183 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import com.nijiko.permissions.PermissionHandler;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class WhosThere extends JavaPlugin{
 
-    public Configuration config;
+	public Configuration config;
 
-    public static Logger log = Logger.getLogger("Minecraft");
-    public static final String plugName = "[WhosThere]"; 
-    public static PermissionHandler Permissions = null;
-    public AdminHandler admins = null;
-    private boolean usePrefix = true;
-    private boolean showStealthed = false;
+	public static Logger log = Logger.getLogger("Minecraft");
+	public static final String plugName = "[WhosThere]"; 
+	private static Plugin perms = null;
+	private PermissionsHandler handler;
 
-    public void onDisable() {
-        log.info(plugName + " Disabled");
-    }
+	public AdminHandler admins = null;
+	private boolean usePrefix = true;
+	private boolean showStealthed = false;
 
-    public void onEnable() {
-        PluginDescriptionFile pdfFile = this.getDescription();
-        setupPermissions();
-        setupOptionals();
+	private enum PermissionsHandler {
+		PERMISSIONSEX, PERMISSIONS
+	}
 
-        //Check to see if there is a configuration file.
-        File yml = new File(getDataFolder()+"/config.yml");
+	public void onDisable() {
+		log.info(plugName + " Disabled");
+	}
 
-        if (!yml.exists()) {
-            new File(getDataFolder().toString()).mkdir();
-            try {
-                yml.createNewFile();
-            }
-            catch (IOException ex) {
-                log.info(plugName + " - Cannot create configuration file. And none to load, using defaults.");
-            }
-        }   
-        setupConfiguration();
+	public void onEnable() {
+		PluginDescriptionFile pdfFile = this.getDescription();
+		setupPermissions();
+		setupOptionals();
 
-        log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
+		//Check to see if there is a configuration file.
+		File yml = new File(getDataFolder()+"/config.yml");
 
-    }
-    
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if (command.getName().equalsIgnoreCase("who")) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                if (!Permissions.has(player, "whosthere.who")) {
-                    return false;
-                } else if (!Permissions.has(player, "whosthere.showall") && admins != null && !showStealthed) {
-                    whoLimited(sender);
-                } else {
-                    whoUnlimited(sender);
-                }
-            } else {
-                whoUnlimited(sender);
-            }
-        }
-        return false;
-    }
+		if (!yml.exists()) {
+			new File(getDataFolder().toString()).mkdir();
+			try {
+				yml.createNewFile();
+			}
+			catch (IOException ex) {
+				log.info(plugName + " - Cannot create configuration file. And none to load, using defaults.");
+			}
+		}   
+		setupConfiguration();
 
-    private void setupConfiguration() {
-        config = getConfiguration();
-        if (config.getKeys(null).isEmpty()) {
-            config.setProperty("use-prefix", usePrefix);
-            config.setProperty("show-stealthed", showStealthed);
-        }
-        usePrefix = config.getBoolean("use-prefix", usePrefix);
-        showStealthed = config.getBoolean("show-stealthed", showStealthed);
-        config.save();
+		log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
 
-    }
-    
-    public void setupOptionals() {
-        if (admins == null) {
-            Plugin admin = this.getServer().getPluginManager().getPlugin("Administrate");
-            if (admin != null) {
-                admins = ((Administrate) admin).getAdminHandler();
-                log.info(plugName + " - Successfully hooked into Administrate v" + admin.getDescription().getVersion());
-            }
-        } 
-    }
+	}
 
-    public void setupPermissions() {
-        if (Permissions == null) {
-            Plugin perms = this.getServer().getPluginManager().getPlugin("Permissions");
-            if (perms != null) {
-                if (!this.getServer().getPluginManager().isPluginEnabled("Permissions"))
-                    this.getServer().getPluginManager().enablePlugin(perms);
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+		if (command.getName().equalsIgnoreCase("who")) {
+			if (sender instanceof Player) {
+				Player player = (Player) sender;
+				if (has(player, "whosthere.who")) {
+					return false;
+				} else if (has(player, "whosthere.showall") && admins != null && !showStealthed) {
+					whoLimited(sender);
+				} else {
+					whoUnlimited(sender);
+				}
+			} else {
+				whoUnlimited(sender);
+			}
+		}
+		return false;
+	}
 
-                Permissions = ((Permissions) perms).getHandler();
-                log.info(plugName + " - Successfully hooked into Permissions v" + perms.getDescription().getVersion());
-            } else {
-                log.info("[" + getDescription().getName() + "] Permissions not detected - disabling plugin");
-                this.getServer().getPluginManager().disablePlugin(this);
-            }
-        }
-    }
+	private void setupConfiguration() {
+		config = getConfiguration();
+		if (config.getKeys(null).isEmpty()) {
+			config.setProperty("use-prefix", usePrefix);
+			config.setProperty("show-stealthed", showStealthed);
+		}
+		usePrefix = config.getBoolean("use-prefix", usePrefix);
+		showStealthed = config.getBoolean("show-stealthed", showStealthed);
+		config.save();
 
-    /*
-     * Gets a Permissions Prefix
-     */
-    public String prefix(Player player) {
-        //Return Null if Permissions didn't load or if usePrefix is false
-        if (Permissions == null || !usePrefix) 
-            return null;        
-        else
-            return Permissions.getGroupPrefix(player.getWorld().getName(), Permissions.getGroup(player.getWorld().getName(), player.getName()));
-    }
+	}
 
-    /*
-     * Sends a limited who list to the command sender
-     * 
-     */
-    private void whoLimited(CommandSender sender) {
-        String playerList = "";
-        int i = 0;
-        for (Player player : getServer().getOnlinePlayers()) {
-            if (isStealthed(player.getName()))
-                continue;
-            if (usePrefix) {
-                playerList += prefix(player);
-            }
-            playerList += player.getName() + ChatColor.WHITE + "  ";
-            i++;
-        }
-        String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
-        sender.sendMessage(message);
-    }
+	public void setupOptionals() {
+		if (admins == null) {
+			Plugin admin = this.getServer().getPluginManager().getPlugin("Administrate");
+			if (admin != null) {
+				admins = ((Administrate) admin).getAdminHandler();
+				log.info(plugName + " - Successfully hooked into Administrate v" + admin.getDescription().getVersion());
+			}
+		} 
+	}
 
-    /*
-     * sends the full who list to the player
-     * 
-     */
-    private void whoUnlimited(CommandSender sender) {
-        String playerList = ChatColor.WHITE + "There are " + ChatColor.BLUE + getServer().getOnlinePlayers().length + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  ";
-        for (Player player : getServer().getOnlinePlayers()) {
-            if (usePrefix) {
-                playerList += prefix(player);
-            }
-            playerList += player.getName() + ChatColor.WHITE + "  ";
-        }
-        sender.sendMessage(playerList);
-    }
+	public void setupPermissions() {
+		Plugin permissionsEx = this.getServer().getPluginManager().getPlugin("PermissionsEx");
+		Plugin permissions = this.getServer().getPluginManager().getPlugin("Permissions");
 
-    /*
-     * Returns whether a player is stealthed or not
-     * 
-     */
-    public boolean isStealthed(String player) {
-        if (admins == null)
-            return false;
-        else
-            return AdminHandler.isStealthed(player);
-    }
+		if (permissionsEx != null) {
+			perms = permissionsEx;
+			this.handler = PermissionsHandler.PERMISSIONSEX;
+			log.info(plugName + " - Successfully hooked into PermissionsEX v" + perms.getDescription().getVersion());
+		} else if (permissions != null) {
+			this.handler = PermissionsHandler.PERMISSIONS;
+			perms = permissions;
+			log.info(plugName + " - Successfully hooked into Permissions v" + perms.getDescription().getVersion());
+		} else {
+			log.info("[" + getDescription().getName() + "] Permissions not detected - disabling plugin");
+			this.getServer().getPluginManager().disablePlugin(this);
+		}
+	}
+
+	public boolean has (Player player, String permission) {
+		switch (handler) {
+		case PERMISSIONSEX:
+			return PermissionsEx.getPermissionManager().has(player, permission);
+		case PERMISSIONS:
+			return ((Permissions) perms).getHandler().has(player, permission);
+		default:
+			return false;
+		}
+	}
+
+
+	/*
+	 * Gets a Permissions Prefix
+	 */
+	public String prefix(Player player) {
+		//Return Null if Permissions didn't load or if usePrefix is false
+		switch (handler) {
+		case PERMISSIONSEX:
+			return PermissionsEx.getPermissionManager().getUser(player.getName()).getOwnPrefix();
+		case PERMISSIONS:
+			return ((Permissions) perms).getHandler().getGroupPrefix(player.getWorld().getName(), ((Permissions) perms).getHandler().getGroup(player.getWorld().getName(), player.getName()));
+		default: return null;
+		}
+	}
+
+	/*
+	 * Sends a limited who list to the command sender
+	 * 
+	 */
+	private void whoLimited(CommandSender sender) {
+		String playerList = "";
+		int i = 0;
+		for (Player player : getServer().getOnlinePlayers()) {
+			if (isStealthed(player.getName()))
+				continue;
+			if (usePrefix) {
+				playerList += prefix(player);
+			}
+			playerList += player.getName() + ChatColor.WHITE + "  ";
+			i++;
+		}
+		String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
+		sender.sendMessage(message);
+	}
+
+	/*
+	 * sends the full who list to the player
+	 * 
+	 */
+	private void whoUnlimited(CommandSender sender) {
+		String playerList = ChatColor.WHITE + "There are " + ChatColor.BLUE + getServer().getOnlinePlayers().length + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  ";
+		for (Player player : getServer().getOnlinePlayers()) {
+			if (usePrefix) {
+				playerList += prefix(player);
+			}
+			playerList += player.getName() + ChatColor.WHITE + "  ";
+		}
+		sender.sendMessage(playerList);
+	}
+
+	/*
+	 * Returns whether a player is stealthed or not
+	 * 
+	 */
+	public boolean isStealthed(String player) {
+		if (admins == null)
+			return false;
+		else
+			return AdminHandler.isStealthed(player);
+	}
 
 }

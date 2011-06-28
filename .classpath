@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="C:/Users/sleak/workspace/libs/craftbukkit-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/sleak/workspace/libs/Permissions.jar"/>
 	<classpathentry kind="lib" path="C:/Users/sleak/workspace/Administrate/bin/Administrate.jar"/>
+	<classpathentry kind="lib" path="C:/Users/sleak/workspace/libs/PermissionsEx.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
