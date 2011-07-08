@@ -30,8 +30,10 @@ public class WhosThere extends JavaPlugin{
 	private PermissionsHandler handler;
 
 	public AdminHandler admins = null;
-	private boolean usePrefix = true;
+	private boolean usePrefix = false;
 	private boolean showStealthed = false;
+	private boolean useColorOption = true;
+	private String colorOption = "namecolor";
 
 	private enum PermissionsHandler {
 		PERMISSIONSEX, PERMISSIONS
@@ -88,9 +90,13 @@ public class WhosThere extends JavaPlugin{
 		if (config.getKeys(null).isEmpty()) {
 			config.setProperty("use-prefix", usePrefix);
 			config.setProperty("show-stealthed", showStealthed);
+			config.setProperty("use-color-option", useColorOption);
+			config.setProperty("color-option-name", colorOption);
 		}
 		usePrefix = config.getBoolean("use-prefix", usePrefix);
 		showStealthed = config.getBoolean("show-stealthed", showStealthed);
+		useColorOption = config.getBoolean("use-color-option", useColorOption);
+		colorOption = config.getString("color-option-name", colorOption);
 		config.save();
 
 	}
@@ -134,6 +140,15 @@ public class WhosThere extends JavaPlugin{
 		}
 	}
 
+	public String option(Player player, String permission) {
+		switch (handler) {
+		case PERMISSIONSEX:
+			return PermissionsEx.getPermissionManager().getUser(player.getName()).getOption(permission);
+		case PERMISSIONS:
+			return ((Permissions) perms).getHandler().getPermissionString(player.getWorld().getName(), ((Permissions) perms).getHandler().getGroup(player.getWorld().getName(), player.getName()), permission);
+		default: return null;
+		}
+	}
 
 	/*
 	 * Gets a Permissions Prefix
@@ -159,10 +174,8 @@ public class WhosThere extends JavaPlugin{
 		for (Player player : getServer().getOnlinePlayers()) {
 			if (isStealthed(player.getName()))
 				continue;
-			if (usePrefix) {
-				playerList += prefix(player);
-			}
-			playerList += player.getName() + ChatColor.WHITE + "  ";
+			
+			playerList += colorize(player);
 			i++;
 		}
 		String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
@@ -175,13 +188,28 @@ public class WhosThere extends JavaPlugin{
 	 */
 	private void whoUnlimited(CommandSender sender) {
 		String playerList = ChatColor.WHITE + "There are " + ChatColor.BLUE + getServer().getOnlinePlayers().length + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  ";
-		for (Player player : getServer().getOnlinePlayers()) {
-			if (usePrefix) {
-				playerList += prefix(player);
-			}
-			playerList += player.getName() + ChatColor.WHITE + "  ";
-		}
+		for (Player player : getServer().getOnlinePlayers()) 
+			playerList += colorize(player);
+		
 		sender.sendMessage(playerList);
+	}
+	
+	/**
+	 * Add colorization based on options selected
+	 * 
+	 * @param p
+	 * @return
+	 */
+	private String colorize (Player p) {
+		String message = "";
+		if (usePrefix) {
+			message += prefix(p);
+		}
+		if (useColorOption) {
+			message += option(p, colorOption);
+		}
+		message += p.getName() + ChatColor.WHITE + "  ";
+		return message;
 	}
 
 	/*
