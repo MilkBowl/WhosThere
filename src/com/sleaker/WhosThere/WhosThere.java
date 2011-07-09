@@ -24,8 +24,8 @@ public class WhosThere extends JavaPlugin{
 
 	public Configuration config;
 
-	public static Logger log = Logger.getLogger("Minecraft");
-	public static final String plugName = "[WhosThere]"; 
+	private static Logger log = Logger.getLogger("Minecraft");
+	private static String plugName; 
 	private static Plugin perms = null;
 	private PermissionsHandler handler;
 
@@ -45,6 +45,7 @@ public class WhosThere extends JavaPlugin{
 
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
+		plugName = "[" + pdfFile.getName() + "]";
 		setupPermissions();
 		setupOptionals();
 
