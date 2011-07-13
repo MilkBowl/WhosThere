@@ -185,8 +185,11 @@ public class WhosThere extends JavaPlugin{
 
 	private void whois(CommandSender sender, String[] args) {
 		Player p = null;
+		if (sender instanceof Player)
+			p = (Player) sender;
+		
 		for (Player pl : this.getServer().getOnlinePlayers()) {
-			if (admins != null && !showStealthed) 
+			if (admins != null && !showStealthed && p != null) 
 				if (AdminHandler.isStealthed(pl.getName(), p))
 					continue;
 			
