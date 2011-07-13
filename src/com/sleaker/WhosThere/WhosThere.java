@@ -72,15 +72,32 @@ public class WhosThere extends JavaPlugin{
 		if (command.getName().equalsIgnoreCase("who")) {
 			if (sender instanceof Player) {
 				Player player = (Player) sender;
-				if (has(player, "whosthere.who")) {
-					return false;
+				if (!has(player, "whosthere.who")) {
+					player.sendMessage("You don't have permission to do that.");
+					return true;
 				} else if (has(player, "whosthere.showall") && admins != null && !showStealthed) {
 					whoLimited(sender);
+					return true;
 				} else {
 					whoUnlimited(sender);
+					return true;
 				}
 			} else {
 				whoUnlimited(sender);
+			}
+		} else if (command.getName().equalsIgnoreCase("whois")) {
+			if (sender instanceof Player) {
+				if (!has((Player) sender, "whosthere.admin")) {
+					sender.sendMessage("You don't have permission to do that.");
+					return true;
+				}
+			}
+			if (args.length < 1) {
+				sender.sendMessage("You must supply a username to get information about");
+				return true;
+			} else {
+				whois(sender, args);
+				return true;
 			}
 		}
 		return false;
@@ -165,6 +182,20 @@ public class WhosThere extends JavaPlugin{
 		}
 	}
 
+	private void whois(CommandSender sender, String[] args) {
+		Player p = null;
+		for (Player pl : this.getServer().getOnlinePlayers()) {
+			if (pl.getName().contains(args[0])) {
+				p = pl;
+				break;
+			}
+		}
+		if (p != null) {
+			//TODO Send formatted message.
+		} else {
+			sender.sendMessage("No player with name " + args[0] + " was found on the server");
+		}
+	}
 	/*
 	 * Sends a limited who list to the command sender
 	 * 

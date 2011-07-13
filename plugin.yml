@@ -6,3 +6,5 @@ commands:
     who:
         aliases: [ list, players, online, playerlist]
         description: lists online players
+    whois:
+        description: get detailed information about a user.
