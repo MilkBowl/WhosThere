@@ -8,6 +8,7 @@ import net.milkbowl.administrate.AdminHandler;
 import net.milkbowl.administrate.Administrate;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -185,13 +186,20 @@ public class WhosThere extends JavaPlugin{
 	private void whois(CommandSender sender, String[] args) {
 		Player p = null;
 		for (Player pl : this.getServer().getOnlinePlayers()) {
+			if (admins != null && !showStealthed) 
+				if (AdminHandler.isStealthed(pl.getName(), p))
+					continue;
+			
 			if (pl.getName().contains(args[0])) {
 				p = pl;
 				break;
 			}
 		}
 		if (p != null) {
-			//TODO Send formatted message.
+			Location pLoc = p.getLocation();
+			p.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
+			p.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
+			p.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
 		} else {
 			sender.sendMessage("No player with name " + args[0] + " was found on the server");
 		}
@@ -244,6 +252,19 @@ public class WhosThere extends JavaPlugin{
 		return message;
 	}
 
+	/**
+	 * Takes a string and replaces &# color codes with ChatColors
+	 * 
+	 * @param message
+	 * @return
+	 */
+	private String replaceColors (String message) {
+		message = message.replaceAll("&a", ChatColor.GREEN + "");
+		message = message.replaceAll("&d", ChatColor.LIGHT_PURPLE + "");
+		message = message.replaceAll("&f", ChatColor.WHITE + "");
+		return message;
+	}
+	
 	/*
 	 * Returns whether a player is stealthed or not
 	 * 
