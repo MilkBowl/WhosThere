@@ -225,6 +225,7 @@ public class WhosThere extends JavaPlugin{
 		}
 		String playerList = "";
 		int i = 0;
+		int j = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
 			if (isStealthed(player.getName()))
 				continue;
@@ -233,9 +234,17 @@ public class WhosThere extends JavaPlugin{
 				playerList += colorize(player);
 				i++;
 			}
+			j++;
 		}
-		String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
-		sender.sendMessage(message);
+		if (i == 0) {
+			sender.sendMessage("No player/worlds found with that name");
+		} else if (args.length == 0) {
+			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + j + ChatColor.WHITE + " players online:  " + playerList;
+			sender.sendMessage(message);
+		} else {
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria: " + playerList;
+			sender.sendMessage(message);
+		}
 	}
 
 	/*
@@ -247,15 +256,21 @@ public class WhosThere extends JavaPlugin{
 		String playerList = "";
 		int i = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
-
 			if ((worldName == null && args.length == 0) || (worldName != null && player.getWorld().getName().equals(worldName)) || (worldName == null && player.getName().contains(args[0]))) {
 				playerList += colorize(player);
 				i++;
 			}
+			
 		}
-		
-		String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
-		sender.sendMessage(message);
+		if (i == 0) {
+			sender.sendMessage("No player/worlds found with that name");
+		} else if (args.length == 0) {
+			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
+			sender.sendMessage(message);
+		} else {
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria: " + playerList;
+			sender.sendMessage(message);
+		}
 	}
 
 	/**
