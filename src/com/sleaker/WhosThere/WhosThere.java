@@ -297,8 +297,7 @@ public class WhosThere extends JavaPlugin{
 			message += option(p, colorOption);
 		}
 		message += p.getName() + ChatColor.WHITE + "  ";
-		log.info(message);
-		return message;
+		return replaceColors(message);
 	}
 
 	/**
@@ -308,9 +307,22 @@ public class WhosThere extends JavaPlugin{
 	 * @return
 	 */
 	private String replaceColors (String message) {
-		message = message.replaceAll("&a", ChatColor.GREEN + "");
-		message = message.replaceAll("&d", ChatColor.LIGHT_PURPLE + "");
-		message = message.replaceAll("&f", ChatColor.WHITE + "");
+		message = message.replace("&0", ChatColor.BLACK + "");
+		message = message.replace("&1", ChatColor.DARK_BLUE + "");
+		message = message.replace("&2", ChatColor.DARK_GREEN + "");
+		message = message.replace("&3", ChatColor.DARK_AQUA + "");
+		message = message.replace("&4", ChatColor.DARK_RED + "");
+		message = message.replace("&5", ChatColor.DARK_PURPLE + "");
+		message = message.replace("&6", ChatColor.GOLD + "");
+		message = message.replace("&7", ChatColor.GRAY + "");
+		message = message.replace("&8", ChatColor.DARK_GRAY + "");
+		message = message.replace("&9", ChatColor.BLUE + "");
+		message = message.replace("&a", ChatColor.GREEN + "");
+		message = message.replace("&b", ChatColor.AQUA + "");
+		message = message.replace("&c", ChatColor.RED + "");
+		message = message.replace("&d", ChatColor.LIGHT_PURPLE + "");
+		message = message.replace("&e", ChatColor.YELLOW + "");
+		message = message.replace("&f", ChatColor.WHITE + "");
 		return message;
 	}
 
