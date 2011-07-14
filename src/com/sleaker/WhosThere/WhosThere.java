@@ -32,9 +32,9 @@ public class WhosThere extends JavaPlugin{
 	private PermissionsHandler handler;
 
 	public AdminHandler admins = null;
-	private boolean usePrefix = false;
+	private boolean usePrefix = true;
 	private boolean showStealthed = false;
-	private boolean useColorOption = true;
+	private boolean useColorOption = false;
 	private String colorOption = "namecolor";
 
 	private enum PermissionsHandler {
@@ -178,7 +178,7 @@ public class WhosThere extends JavaPlugin{
 		//Return Null if Permissions didn't load or if usePrefix is false
 		switch (handler) {
 		case PERMISSIONSEX:
-			return PermissionsEx.getPermissionManager().getUser(player.getName()).getOwnPrefix();
+			return PermissionsEx.getPermissionManager().getUser(player.getName()).getPrefix();
 		case PERMISSIONS:
 			return ((Permissions) perms).getHandler().getGroupPrefix(player.getWorld().getName(), ((Permissions) perms).getHandler().getGroup(player.getWorld().getName(), player.getName()));
 		default: return null;
@@ -297,6 +297,7 @@ public class WhosThere extends JavaPlugin{
 			message += option(p, colorOption);
 		}
 		message += p.getName() + ChatColor.WHITE + "  ";
+		log.info(message);
 		return message;
 	}
 
