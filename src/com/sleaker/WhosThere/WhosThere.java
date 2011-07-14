@@ -9,7 +9,6 @@ import net.milkbowl.administrate.Administrate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -214,14 +213,11 @@ public class WhosThere extends JavaPlugin{
 	 * 
 	 */
 	private void whoLimited(CommandSender sender, String[] args) {
+		
 		String worldName = null;
 		if (args.length > 1) {
-			for (World world : getServer().getWorlds()) {
-				if (world.getName().equalsIgnoreCase(args[0])) {
-					worldName = world.getName();
-					break;
-				}
-			}
+			if (getServer().getWorld(args[0]) != null)
+				worldName = getServer().getWorld(args[0]).getName();
 		}
 		String playerList = "";
 		int i = 0;
@@ -253,6 +249,10 @@ public class WhosThere extends JavaPlugin{
 	 */
 	private void whoUnlimited(CommandSender sender, String[] args) {
 		String worldName = null;
+		if (args.length > 1) {
+			if (getServer().getWorld(args[0]) != null)
+				worldName = getServer().getWorld(args[0]).getName();
+		}
 		String playerList = "";
 		int i = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
