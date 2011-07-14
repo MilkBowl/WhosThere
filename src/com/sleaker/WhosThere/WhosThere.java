@@ -9,6 +9,7 @@ import net.milkbowl.administrate.Administrate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -201,9 +202,9 @@ public class WhosThere extends JavaPlugin{
 		}
 		if (p != null) {
 			Location pLoc = p.getLocation();
-			p.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
-			p.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
-			p.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
+			sender.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
+			sender.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
+			sender.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
 		} else {
 			sender.sendMessage("No player with name " + args[0] + " was found on the server");
 		}
@@ -214,10 +215,9 @@ public class WhosThere extends JavaPlugin{
 	 */
 	private void whoLimited(CommandSender sender, String[] args) {
 		
-		String worldName = null;
-		if (args.length > 1) {
-			if (getServer().getWorld(args[0]) != null)
-				worldName = getServer().getWorld(args[0]).getName();
+		World world = null;
+		if (args.length > 0) {
+			world = getServer().getWorld(args[0]);
 		}
 		String playerList = "";
 		int i = 0;
@@ -226,16 +226,16 @@ public class WhosThere extends JavaPlugin{
 			if (isStealthed(player.getName()))
 				continue;
 
-			if ((worldName == null && args.length == 0) || (worldName != null && player.getWorld().getName().equals(worldName)) || (worldName == null && player.getName().contains(args[0]))) {
+			if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
 				playerList += colorize(player);
 				i++;
 			}
 			j++;
 		}
-		if (i == 0 && worldName == null) {
+		if (i == 0 && world == null && args.length > 0) {
 			sender.sendMessage("No players found with that name.");
-		} else if (i == 0 && worldName != null) {
-			sender.sendMessage("No players were found on " + worldName);
+		} else if (i == 0 && world != null) {
+			sender.sendMessage("No players were found on " + world.getName());
 		}  else if (args.length == 0) {
 			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + j + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
@@ -250,24 +250,23 @@ public class WhosThere extends JavaPlugin{
 	 * 
 	 */
 	private void whoUnlimited(CommandSender sender, String[] args) {
-		String worldName = null;
-		if (args.length > 1) {
-			if (getServer().getWorld(args[0]) != null)
-				worldName = getServer().getWorld(args[0]).getName();
+		World world = null;
+		if (args.length > 0) {
+			world = getServer().getWorld(args[0]);
 		}
 		String playerList = "";
 		int i = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
-			if ((worldName == null && args.length == 0) || (worldName != null && player.getWorld().getName().equals(worldName)) || (worldName == null && player.getName().contains(args[0]))) {
+			if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
 				playerList += colorize(player);
 				i++;
 			}
 			
 		}
-		if (i == 0 && worldName == null) {
+		if (i == 0 && world == null && args.length > 0) {
 			sender.sendMessage("No players found with that name.");
-		} else if (i == 0 && worldName != null) {
-			sender.sendMessage("No players were found on " + worldName);
+		} else if (i == 0 && world != null) {
+			sender.sendMessage("No players were found on " + world.getName());
 		} else if (args.length == 0) {
 			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
