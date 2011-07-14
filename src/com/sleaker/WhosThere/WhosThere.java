@@ -77,7 +77,7 @@ public class WhosThere extends JavaPlugin{
 				if (!has(player, "whosthere.who")) {
 					player.sendMessage("You don't have permission to do that.");
 					return true;
-				} else if (has(player, "whosthere.showall") && admins != null && !showStealthed) {
+				} else if (!has(player, "whosthere.showall") && admins != null && !showStealthed) {
 					whoLimited(sender, args);
 					return true;
 				} else {
