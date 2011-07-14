@@ -9,6 +9,7 @@ import net.milkbowl.administrate.Administrate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -77,14 +78,15 @@ public class WhosThere extends JavaPlugin{
 					player.sendMessage("You don't have permission to do that.");
 					return true;
 				} else if (has(player, "whosthere.showall") && admins != null && !showStealthed) {
-					whoLimited(sender);
+					whoLimited(sender, args);
 					return true;
 				} else {
-					whoUnlimited(sender);
+					whoUnlimited(sender, args);
 					return true;
 				}
 			} else {
-				whoUnlimited(sender);
+				whoUnlimited(sender, args);
+				return true;
 			}
 		} else if (command.getName().equalsIgnoreCase("whois")) {
 			if (sender instanceof Player) {
@@ -187,12 +189,12 @@ public class WhosThere extends JavaPlugin{
 		Player p = null;
 		if (sender instanceof Player)
 			p = (Player) sender;
-		
+
 		for (Player pl : this.getServer().getOnlinePlayers()) {
 			if (admins != null && !showStealthed && p != null) 
 				if (AdminHandler.isStealthed(pl.getName(), p))
 					continue;
-			
+
 			if (pl.getName().contains(args[0])) {
 				p = pl;
 				break;
@@ -211,15 +213,26 @@ public class WhosThere extends JavaPlugin{
 	 * Sends a limited who list to the command sender
 	 * 
 	 */
-	private void whoLimited(CommandSender sender) {
+	private void whoLimited(CommandSender sender, String[] args) {
+		String worldName = null;
+		if (args.length > 1) {
+			for (World world : getServer().getWorlds()) {
+				if (world.getName().equalsIgnoreCase(args[0])) {
+					worldName = world.getName();
+					break;
+				}
+			}
+		}
 		String playerList = "";
 		int i = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
 			if (isStealthed(player.getName()))
 				continue;
-			
-			playerList += colorize(player);
-			i++;
+
+			if ((worldName == null && args.length == 0) || (worldName != null && player.getWorld().getName().equals(worldName)) || (worldName == null && player.getName().contains(args[0]))) {
+				playerList += colorize(player);
+				i++;
+			}
 		}
 		String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
 		sender.sendMessage(message);
@@ -229,14 +242,22 @@ public class WhosThere extends JavaPlugin{
 	 * sends the full who list to the player
 	 * 
 	 */
-	private void whoUnlimited(CommandSender sender) {
-		String playerList = ChatColor.WHITE + "There are " + ChatColor.BLUE + getServer().getOnlinePlayers().length + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  ";
-		for (Player player : getServer().getOnlinePlayers()) 
-			playerList += colorize(player);
+	private void whoUnlimited(CommandSender sender, String[] args) {
+		String worldName = null;
+		String playerList = "";
+		int i = 0;
+		for (Player player : getServer().getOnlinePlayers()) {
+
+			if ((worldName == null && args.length == 0) || (worldName != null && player.getWorld().getName().equals(worldName)) || (worldName == null && player.getName().contains(args[0]))) {
+				playerList += colorize(player);
+				i++;
+			}
+		}
 		
-		sender.sendMessage(playerList);
+		String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
+		sender.sendMessage(message);
 	}
-	
+
 	/**
 	 * Add colorization based on options selected
 	 * 
@@ -267,7 +288,7 @@ public class WhosThere extends JavaPlugin{
 		message = message.replaceAll("&f", ChatColor.WHITE + "");
 		return message;
 	}
-	
+
 	/*
 	 * Returns whether a player is stealthed or not
 	 * 
