@@ -232,9 +232,11 @@ public class WhosThere extends JavaPlugin{
 			}
 			j++;
 		}
-		if (i == 0) {
-			sender.sendMessage("No player/worlds found with that name");
-		} else if (args.length == 0) {
+		if (i == 0 && worldName == null) {
+			sender.sendMessage("No players found with that name.");
+		} else if (i == 0 && worldName != null) {
+			sender.sendMessage("No players were found on " + worldName);
+		}  else if (args.length == 0) {
 			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + j + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
 		} else {
@@ -262,8 +264,10 @@ public class WhosThere extends JavaPlugin{
 			}
 			
 		}
-		if (i == 0) {
-			sender.sendMessage("No player/worlds found with that name");
+		if (i == 0 && worldName == null) {
+			sender.sendMessage("No players found with that name.");
+		} else if (i == 0 && worldName != null) {
+			sender.sendMessage("No players were found on " + worldName);
 		} else if (args.length == 0) {
 			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
