@@ -239,8 +239,11 @@ public class WhosThere extends JavaPlugin{
 		}  else if (args.length == 0) {
 			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + j + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
+		} else if (world != null) {
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on world + " + world.getName() + ":  " + playerList;
+			sender.sendMessage(message);
 		} else {
-			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria: " + playerList;
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria:  " + playerList;
 			sender.sendMessage(message);
 		}
 	}
@@ -270,8 +273,11 @@ public class WhosThere extends JavaPlugin{
 		} else if (args.length == 0) {
 			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
+		} else if (world != null) {
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on world + " + world.getName() + ":  " + playerList;
+			sender.sendMessage(message);
 		} else {
-			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria: " + playerList;
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria:  " + playerList;
 			sender.sendMessage(message);
 		}
 	}
