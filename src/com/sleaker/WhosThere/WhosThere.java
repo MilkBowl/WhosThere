@@ -2,10 +2,13 @@ package com.sleaker.WhosThere;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import net.milkbowl.administrate.AdminHandler;
 import net.milkbowl.administrate.Administrate;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,12 +18,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-
-import ru.tehkode.permissions.bukkit.PermissionsEx;
-
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class WhosThere extends JavaPlugin{
 
@@ -28,18 +28,13 @@ public class WhosThere extends JavaPlugin{
 
 	private static Logger log = Logger.getLogger("Minecraft");
 	private static String plugName; 
-	private static Plugin perms = null;
-	private PermissionsHandler handler;
+	private Permission perms;
 
 	public AdminHandler admins = null;
 	private boolean usePrefix = true;
 	private boolean showStealthed = false;
 	private boolean useColorOption = false;
 	private String colorOption = "namecolor";
-
-	private enum PermissionsHandler {
-		PERMISSIONSEX, PERMISSIONS
-	}
 
 	public void onDisable() {
 		log.info(plugName + " Disabled");
@@ -48,8 +43,11 @@ public class WhosThere extends JavaPlugin{
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
 		plugName = "[" + pdfFile.getName() + "]";
-		setupPermissions();
-		setupOptionals();
+		//If we can't load dependencies, disable
+		if (!setupDependencies()) {
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
@@ -132,57 +130,35 @@ public class WhosThere extends JavaPlugin{
 		} 
 	}
 
-	public void setupPermissions() {
-		Plugin permissionsEx = this.getServer().getPluginManager().getPlugin("PermissionsEx");
-		Plugin permissions = this.getServer().getPluginManager().getPlugin("Permissions");
-
-		if (permissionsEx != null) {
-			perms = permissionsEx;
-			this.handler = PermissionsHandler.PERMISSIONSEX;
-			log.info(plugName + " - Successfully hooked into PermissionsEX v" + perms.getDescription().getVersion());
-		} else if (permissions != null) {
-			this.handler = PermissionsHandler.PERMISSIONS;
-			perms = permissions;
-			log.info(plugName + " - Successfully hooked into Permissions v" + perms.getDescription().getVersion());
-		} else {
-			log.info("[" + getDescription().getName() + "] Permissions not detected - disabling plugin");
-			this.getServer().getPluginManager().disablePlugin(this);
-		}
+	private boolean setupDependencies() {
+        Collection<RegisteredServiceProvider<Permission>> perms = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.permission.Permission.class);
+        for(RegisteredServiceProvider<Permission> perm : perms) {
+            Permission p = perm.getProvider();
+            log.info(String.format("[%s] Found Service (Permission) %s", getDescription().getName(), p.getName()));
+        }
+        
+        this.perms = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
+        log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.perms.getName()));
+        
+		if (this.perms == null)
+			return false;
+		else
+			return true;
 	}
 
-	public boolean has (Player player, String permission) {
-		switch (handler) {
-		case PERMISSIONSEX:
-			return PermissionsEx.getPermissionManager().has(player, permission);
-		case PERMISSIONS:
-			return ((Permissions) perms).getHandler().has(player, permission);
-		default:
-			return false;
-		}
+	public boolean has(Player player, String permission) {
+		return this.perms.has(player, permission);
 	}
 
 	public String option(Player player, String permission) {
-		switch (handler) {
-		case PERMISSIONSEX:
-			return PermissionsEx.getPermissionManager().getUser(player.getName()).getOption(permission);
-		case PERMISSIONS:
-			return ((Permissions) perms).getHandler().getPermissionString(player.getWorld().getName(), ((Permissions) perms).getHandler().getGroup(player.getWorld().getName(), player.getName()), permission);
-		default: return null;
-		}
+		return this.perms.getPlayerInfoString(player, permission, null);
 	}
 
 	/*
 	 * Gets a Permissions Prefix
 	 */
 	public String prefix(Player player) {
-		//Return Null if Permissions didn't load or if usePrefix is false
-		switch (handler) {
-		case PERMISSIONSEX:
-			return PermissionsEx.getPermissionManager().getUser(player.getName()).getPrefix();
-		case PERMISSIONS:
-			return ((Permissions) perms).getHandler().getGroupPrefix(player.getWorld().getName(), ((Permissions) perms).getHandler().getGroup(player.getWorld().getName(), player.getName()));
-		default: return null;
-		}
+		return this.perms.getPlayerPrefix(player);
 	}
 
 	private void whois(CommandSender sender, String[] args) {
@@ -293,7 +269,7 @@ public class WhosThere extends JavaPlugin{
 		if (usePrefix) {
 			message += prefix(p);
 		}
-		if (useColorOption) {
+		if (useColorOption && colorOption != "" && colorOption != null) {
 			message += option(p, colorOption);
 		}
 		message += p.getName() + ChatColor.WHITE + "  ";
