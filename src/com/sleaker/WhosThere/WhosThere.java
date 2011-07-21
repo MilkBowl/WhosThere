@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import net.milkbowl.administrate.AdminHandler;
 import net.milkbowl.administrate.Administrate;
-import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
