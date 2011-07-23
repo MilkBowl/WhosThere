@@ -40,7 +40,7 @@
   
   <target name="compress" description="Compression target">
   		<echo>Compressing</echo>
-        <jar jarfile="WhosThere.jar" basedir="bin" includes="net/**/*, plugin.yml">
+        <jar jarfile="WhosThere.jar" basedir="bin" includes="**/*, plugin.yml">
 		<manifest>
 			<attribute name="Built-By" value="${user.name}" />
 		</manifest>
