@@ -25,8 +25,8 @@ public class WhosThere extends JavaPlugin{
 
 	public Configuration config;
 
-	private static Logger log = Logger.getLogger("Minecraft");
-	private static String plugName; 
+	private Logger log = Logger.getLogger("Minecraft");
+	private String plugName; 
 	private Permission perms;
 
 	public AdminHandler admins = null;
