@@ -47,7 +47,9 @@ public class WhosThere extends JavaPlugin{
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-
+		
+		setupOptionals();
+		
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
 
@@ -76,7 +78,7 @@ public class WhosThere extends JavaPlugin{
 					return true;
 				} else if (admins != null && !showStealthed) {
 					if (!has(player, "administrate.allmessages")) {
-						whoLimited(sender, args);
+						whoLimited(player, args);
 						return true;
 					}
 				}
@@ -185,7 +187,7 @@ public class WhosThere extends JavaPlugin{
 	 * Sends a limited who list to the command sender
 	 * 
 	 */
-	private void whoLimited(CommandSender sender, String[] args) {
+	private void whoLimited(Player sender, String[] args) {
 
 		World world = null;
 		if (args.length > 0) {
@@ -195,7 +197,7 @@ public class WhosThere extends JavaPlugin{
 		int i = 0;
 		int j = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
-			if (isStealthed(player.getName()))
+			if (isStealthed(player.getName(), sender))
 				continue;
 
 			if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
@@ -302,11 +304,11 @@ public class WhosThere extends JavaPlugin{
 	 * Returns whether a player is stealthed or not
 	 * 
 	 */
-	public boolean isStealthed(String player) {
+	public boolean isStealthed(String player, Player p) {
 		if (admins == null)
 			return false;
 		else
-			return AdminHandler.isStealthed(player);
+			return AdminHandler.isStealthed(player, p);
 	}
 
 }
