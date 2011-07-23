@@ -74,17 +74,17 @@ public class WhosThere extends JavaPlugin{
 				if (!has(player, "whosthere.who")) {
 					player.sendMessage("You don't have permission to do that.");
 					return true;
-				} else if (!has(player, "whosthere.showall") && admins != null && !showStealthed) {
-					whoLimited(sender, args);
-					return true;
-				} else {
-					whoUnlimited(sender, args);
-					return true;
+				} else if (admins != null && !showStealthed) {
+					if (!has(player, "administrate.allmessages")) {
+						whoLimited(sender, args);
+						return true;
+					}
 				}
-			} else {
-				whoUnlimited(sender, args);
-				return true;
-			}
+			} 
+			//If this is Console, or a Player with Administrate priveledges they will see this message
+			whoUnlimited(sender, args);
+			return true;
+
 		} else if (command.getName().equalsIgnoreCase("whois")) {
 			if (sender instanceof Player) {
 				if (!has((Player) sender, "whosthere.admin")) {
@@ -130,15 +130,15 @@ public class WhosThere extends JavaPlugin{
 	}
 
 	private boolean setupDependencies() {
-        Collection<RegisteredServiceProvider<Permission>> perms = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.permission.Permission.class);
-        for(RegisteredServiceProvider<Permission> perm : perms) {
-            Permission p = perm.getProvider();
-            log.info(String.format("[%s] Found Service (Permission) %s", getDescription().getName(), p.getName()));
-        }
-        
-        this.perms = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
-        log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.perms.getName()));
-        
+		Collection<RegisteredServiceProvider<Permission>> perms = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.permission.Permission.class);
+		for(RegisteredServiceProvider<Permission> perm : perms) {
+			Permission p = perm.getProvider();
+			log.info(String.format("[%s] Found Service (Permission) %s", getDescription().getName(), p.getName()));
+		}
+
+		this.perms = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
+		log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.perms.getName()));
+
 		if (this.perms == null)
 			return false;
 		else
@@ -189,7 +189,7 @@ public class WhosThere extends JavaPlugin{
 	 * 
 	 */
 	private void whoLimited(CommandSender sender, String[] args) {
-		
+
 		World world = null;
 		if (args.length > 0) {
 			world = getServer().getWorld(args[0]);
@@ -239,7 +239,7 @@ public class WhosThere extends JavaPlugin{
 				playerList += colorize(player);
 				i++;
 			}
-			
+
 		}
 		if (i == 0 && world == null && args.length > 0) {
 			sender.sendMessage("No players found with that name.");
