@@ -139,10 +139,7 @@ public class WhosThere extends JavaPlugin{
 		this.perms = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
 		log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.perms.getName()));
 
-		if (this.perms == null)
-			return false;
-		else
-			return true;
+		return (this.perms != null);
 	}
 
 	public boolean has(Player player, String permission) {
