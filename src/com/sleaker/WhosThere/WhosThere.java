@@ -195,7 +195,6 @@ public class WhosThere extends JavaPlugin{
 		}
 		String playerList = "";
 		int i = 0;
-		int j = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
 			if (isStealthed(player.getName(), sender))
 				continue;
@@ -204,14 +203,13 @@ public class WhosThere extends JavaPlugin{
 				playerList += colorize(player);
 				i++;
 			}
-			j++;
 		}
 		if (i == 0 && world == null && args.length > 0) {
 			sender.sendMessage("No players found with that name.");
 		} else if (i == 0 && world != null) {
 			sender.sendMessage("No players were found on " + world.getName());
 		}  else if (args.length == 0) {
-			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + j + ChatColor.WHITE + " players online:  " + playerList;
+			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
 			sender.sendMessage(message);
 		} else if (world != null) {
 			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ":  " + playerList;
