@@ -35,6 +35,9 @@ public class WhosThere extends JavaPlugin{
 	private boolean useColorOption = false;
 	private String colorOption = "namecolor";
 
+	private static final int charsPerLine = 64;
+	private static final String lineBreak = "{LB}";
+
 	public void onDisable() {
 		log.info(plugName + " Disabled");
 	}
@@ -47,9 +50,9 @@ public class WhosThere extends JavaPlugin{
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-		
+
 		setupOptionals();
-		
+
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
 
@@ -78,13 +81,13 @@ public class WhosThere extends JavaPlugin{
 					return true;
 				} else if (admins != null && !showStealthed) {
 					if (!has(player, "administrate.allmessages")) {
-						whoLimited(player, args);
+						whoCommand(player, args, true);
 						return true;
 					}
 				}
 			} 
 			//If this is Console, or a Player with Administrate priveledges they will see this message
-			whoUnlimited(sender, args);
+			whoCommand(sender, args, false);
 			return true;
 
 		} else if (command.getName().equalsIgnoreCase("whois")) {
@@ -187,7 +190,7 @@ public class WhosThere extends JavaPlugin{
 	 * Sends a limited who list to the command sender
 	 * 
 	 */
-	private void whoLimited(Player sender, String[] args) {
+	private void whoCommand(CommandSender sender, String[] args, boolean limited) {
 
 		World world = null;
 		if (args.length > 0) {
@@ -195,12 +198,25 @@ public class WhosThere extends JavaPlugin{
 		}
 		String playerList = "";
 		int i = 0;
+		int remainingChars = charsPerLine;
 		for (Player player : getServer().getOnlinePlayers()) {
-			if (isStealthed(player.getName(), sender))
-				continue;
+			if (limited)
+				if (isStealthed(player.getName(), (Player) sender))
+					continue;
 
 			if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
+				if (remainingChars - player.getName().length() < 0) {
+					playerList += lineBreak;
+					remainingChars = charsPerLine;
+				}
+				//Normalize our color in case we have bleed-through
+				playerList += ChatColor.WHITE;
+				//If this isn't a newline lets put in our spacer
+				if (remainingChars != 64)
+					playerList += "  ";
+				//Add the colorized playername to the list
 				playerList += colorize(player);
+				remainingChars -= (player.getName().length() + 2);
 				i++;
 			}
 		}
@@ -209,48 +225,14 @@ public class WhosThere extends JavaPlugin{
 		} else if (i == 0 && world != null) {
 			sender.sendMessage("No players were found on " + world.getName());
 		}  else if (args.length == 0) {
-			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
-			sender.sendMessage(message);
+			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online:" + lineBreak + playerList;
+			sendWrappedText(sender, message);
 		} else if (world != null) {
-			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ":  " + playerList;
-			sender.sendMessage(message);
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ":" + lineBreak + playerList;
+			sendWrappedText(sender, message);
 		} else {
-			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria:  " + playerList;
-			sender.sendMessage(message);
-		}
-	}
-
-	/*
-	 * sends the full who list to the player
-	 * 
-	 */
-	private void whoUnlimited(CommandSender sender, String[] args) {
-		World world = null;
-		if (args.length > 0) {
-			world = getServer().getWorld(args[0]);
-		}
-		String playerList = "";
-		int i = 0;
-		for (Player player : getServer().getOnlinePlayers()) {
-			if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
-				playerList += colorize(player);
-				i++;
-			}
-
-		}
-		if (i == 0 && world == null && args.length > 0) {
-			sender.sendMessage("No players found with that name.");
-		} else if (i == 0 && world != null) {
-			sender.sendMessage("No players were found on " + world.getName());
-		} else if (args.length == 0) {
-			String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + getServer().getMaxPlayers() + ChatColor.WHITE + " players online:  " + playerList;
-			sender.sendMessage(message);
-		} else if (world != null) {
-			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players " + world.getName() + ":  " + playerList;
-			sender.sendMessage(message);
-		} else {
-			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria:  " + playerList;
-			sender.sendMessage(message);
+			String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria:" + lineBreak + playerList;
+			sendWrappedText(sender, message);
 		}
 	}
 
@@ -268,7 +250,7 @@ public class WhosThere extends JavaPlugin{
 		if (useColorOption && colorOption != "" && colorOption != null) {
 			message += option(p, colorOption);
 		}
-		message += p.getName() + ChatColor.WHITE + "  ";
+		message += p.getName();
 		return replaceColors(message);
 	}
 
@@ -307,6 +289,12 @@ public class WhosThere extends JavaPlugin{
 			return false;
 		else
 			return AdminHandler.isStealthed(player, p);
+	}
+
+	private void sendWrappedText(CommandSender sender, String message) {
+		for(String messageLine : message.split(lineBreak)) {
+			sender.sendMessage(messageLine);
+		}
 	}
 
 }
