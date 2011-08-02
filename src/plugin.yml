@@ -1,7 +1,7 @@
 name: WhosThere
 main: com.sleaker.WhosThere.WhosThere
 author: Sleaker
-version: 1.2-b000
+version: 1.3-b000
 depend: [Vault]
 softdepend: [Administrate]
 commands:
