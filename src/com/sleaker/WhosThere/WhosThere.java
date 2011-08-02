@@ -36,7 +36,7 @@ public class WhosThere extends JavaPlugin{
 	private String colorOption = "namecolor";
 
 	private static final int charsPerLine = 64;
-	private static final String lineBreak = "{LB}";
+	private static final String lineBreak = "%LB%";
 
 	public void onDisable() {
 		log.info(plugName + " Disabled");
