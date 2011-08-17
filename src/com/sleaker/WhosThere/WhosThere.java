@@ -15,6 +15,10 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -33,6 +37,7 @@ public class WhosThere extends JavaPlugin{
 	private boolean usePrefix = true;
 	private boolean showStealthed = false;
 	private boolean useColorOption = false;
+	private boolean displayOnLogin = false;
 	private String colorOption = "namecolor";
 
 	private static final int charsPerLine = 52;
@@ -66,7 +71,8 @@ public class WhosThere extends JavaPlugin{
 			}
 		}   
 		setupConfiguration();
-
+		
+		this.getServer().getPluginManager().registerEvent(Type.PLAYER_LOGIN, new WhoPlayerListener(this), Priority.Monitor, this);
 		log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
 
 	}
@@ -115,11 +121,13 @@ public class WhosThere extends JavaPlugin{
 			config.setProperty("show-stealthed", showStealthed);
 			config.setProperty("use-color-option", useColorOption);
 			config.setProperty("color-option-name", colorOption);
+			config.setProperty("display-on-login", displayOnLogin);
 		}
 		usePrefix = config.getBoolean("use-prefix", usePrefix);
 		showStealthed = config.getBoolean("show-stealthed", showStealthed);
 		useColorOption = config.getBoolean("use-color-option", useColorOption);
 		colorOption = config.getString("color-option-name", colorOption);
+		displayOnLogin = config.getBoolean("display-on-login", displayOnLogin);
 		config.save();
 
 	}
@@ -297,4 +305,19 @@ public class WhosThere extends JavaPlugin{
 		}
 	}
 
+	public class WhoPlayerListener extends PlayerListener {
+		
+		WhosThere plugin;
+		
+		public WhoPlayerListener(WhosThere plugin) {
+			this.plugin = plugin;
+		}
+		
+		@Override
+		public void onPlayerLogin(PlayerLoginEvent event) {
+			if (displayOnLogin) {
+				plugin.getServer().getPluginCommand("who").execute(event.getPlayer(), "who", new String[0]);
+			}
+		}
+	}
 }
