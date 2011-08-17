@@ -35,7 +35,7 @@ public class WhosThere extends JavaPlugin{
 	private boolean useColorOption = false;
 	private String colorOption = "namecolor";
 
-	private static final int charsPerLine = 64;
+	private static final int charsPerLine = 52;
 	private static final String lineBreak = "%LB%";
 
 	public void onDisable() {
@@ -212,7 +212,7 @@ public class WhosThere extends JavaPlugin{
 				//Normalize our color in case we have bleed-through
 				playerList += ChatColor.WHITE;
 				//If this isn't a newline lets put in our spacer
-				if (remainingChars != 64)
+				if (remainingChars != charsPerLine)
 					playerList += "  ";
 				//Add the colorized playername to the list
 				playerList += colorize(player);
