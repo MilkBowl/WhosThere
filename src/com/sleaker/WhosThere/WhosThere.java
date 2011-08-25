@@ -2,7 +2,9 @@ package com.sleaker.WhosThere;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import net.milkbowl.administrate.AdminHandler;
@@ -39,7 +41,7 @@ public class WhosThere extends JavaPlugin{
 	private boolean useColorOption = false;
 	private boolean displayOnLogin = false;
 	private String colorOption = "namecolor";
-
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - MMM, dd");
 	private static final int charsPerLine = 52;
 	private static final String lineBreak = "%LB%";
 
@@ -98,7 +100,7 @@ public class WhosThere extends JavaPlugin{
 
 		} else if (command.getName().equalsIgnoreCase("whois")) {
 			if (sender instanceof Player) {
-				if (!has((Player) sender, "whosthere.admin")) {
+				if (!has((Player) sender, "whosthere.whois")) {
 					sender.sendMessage("You don't have permission to do that.");
 					return true;
 				}
@@ -188,12 +190,27 @@ public class WhosThere extends JavaPlugin{
 		if (p != null) {
 			Location pLoc = p.getLocation();
 			sender.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
+			if (sender instanceof Player && !has((Player) sender, "whosthere.admin")) 
+				return;
 			sender.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
 			sender.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
-		} else {
+		} else if (checkOfflinePlayer(args[0], sender)) {
 			sender.sendMessage("No player with name " + args[0] + " was found on the server");
 		}
 	}
+	
+	private boolean checkOfflinePlayer(String playerName, CommandSender sender) {
+		for (World world : getServer().getWorlds()) {
+			File file = new File(world.getName() + File.separator + "players" + File.separator + playerName + ".dat");
+			
+			if (file.exists()) {
+				sender.sendMessage(replaceColors("&aLast Online: &d" + dateFormat.format(new Date(file.lastModified()))));
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/*
 	 * Sends a limited who list to the command sender
 	 * 
