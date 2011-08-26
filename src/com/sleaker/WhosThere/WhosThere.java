@@ -296,12 +296,12 @@ public class WhosThere extends JavaPlugin{
 		message = message.replace("&7", ChatColor.GRAY + "");
 		message = message.replace("&8", ChatColor.DARK_GRAY + "");
 		message = message.replace("&9", ChatColor.BLUE + "");
-		message = message.replace("&a", ChatColor.GREEN + "");
-		message = message.replace("&b", ChatColor.AQUA + "");
-		message = message.replace("&c", ChatColor.RED + "");
-		message = message.replace("&d", ChatColor.LIGHT_PURPLE + "");
-		message = message.replace("&e", ChatColor.YELLOW + "");
-		message = message.replace("&f", ChatColor.WHITE + "");
+		message = message.replace("(?i)&a", ChatColor.GREEN + "");
+		message = message.replace("(?i)&b", ChatColor.AQUA + "");
+		message = message.replace("(?i)&c", ChatColor.RED + "");
+		message = message.replace("(?i)&d", ChatColor.LIGHT_PURPLE + "");
+		message = message.replace("(?i)&e", ChatColor.YELLOW + "");
+		message = message.replace("(?i)&f", ChatColor.WHITE + "");
 		return message;
 	}
 
