@@ -165,7 +165,7 @@ public class WhosThere extends JavaPlugin{
 				return;
 			sender.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
 			sender.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
-		} else if (checkOfflinePlayer(args[0], sender)) {
+		} else if (!checkOfflinePlayer(args[0], sender)) {
 			sender.sendMessage("No player with name " + args[0] + " was found on the server");
 		}
 	}
