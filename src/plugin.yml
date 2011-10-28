@@ -9,4 +9,5 @@ commands:
         aliases: [ list, players, online, playerlist]
         description: lists online players
     whois:
+        aliases: [ seen ]
         description: get detailed information about a user.
