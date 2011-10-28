@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import net.milkbowl.administrate.AdminHandler;
-import net.milkbowl.administrate.Administrate;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
@@ -21,7 +19,6 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,9 +32,7 @@ public class WhosThere extends JavaPlugin{
 	private String plugName; 
 	private Permission perms;
 
-	public AdminHandler admins = null;
 	private boolean usePrefix = true;
-	private boolean showStealthed = false;
 	private boolean useColorOption = false;
 	private boolean displayOnLogin = false;
 	private String colorOption = "namecolor";
@@ -57,8 +52,6 @@ public class WhosThere extends JavaPlugin{
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-
-		setupOptionals();
 
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
@@ -87,17 +80,11 @@ public class WhosThere extends JavaPlugin{
 				if (!has(player, "whosthere.who")) {
 					player.sendMessage("You don't have permission to do that.");
 					return true;
-				} else if (admins != null && !showStealthed) {
-					if (!has(player, "administrate.allmessages")) {
-						whoCommand(player, args, true);
-						return true;
-					}
 				}
 			} 
 			//If this is Console, or a Player with Administrate priveledges they will see this message
 			whoCommand(sender, args, false);
 			return true;
-
 		} else if (command.getName().equalsIgnoreCase("whois")) {
 			if (sender instanceof Player) {
 				if (!has((Player) sender, "whosthere.whois")) {
@@ -120,28 +107,16 @@ public class WhosThere extends JavaPlugin{
 		config = getConfiguration();
 		if (config.getKeys(null).isEmpty()) {
 			config.setProperty("use-prefix", usePrefix);
-			config.setProperty("show-stealthed", showStealthed);
 			config.setProperty("use-color-option", useColorOption);
 			config.setProperty("color-option-name", colorOption);
 			config.setProperty("display-on-login", displayOnLogin);
 		}
 		usePrefix = config.getBoolean("use-prefix", usePrefix);
-		showStealthed = config.getBoolean("show-stealthed", showStealthed);
 		useColorOption = config.getBoolean("use-color-option", useColorOption);
 		colorOption = config.getString("color-option-name", colorOption);
 		displayOnLogin = config.getBoolean("display-on-login", displayOnLogin);
 		config.save();
 
-	}
-
-	public void setupOptionals() {
-		if (admins == null) {
-			Plugin admin = this.getServer().getPluginManager().getPlugin("Administrate");
-			if (admin != null) {
-				admins = ((Administrate) admin).getAdminHandler();
-				log.info(plugName + " - Successfully hooked into Administrate v" + admin.getDescription().getVersion());
-			}
-		} 
 	}
 
 	private boolean setupDependencies() {
@@ -178,10 +153,6 @@ public class WhosThere extends JavaPlugin{
 			p = (Player) sender;
 
 		for (Player pl : this.getServer().getOnlinePlayers()) {
-			if (admins != null && !showStealthed && p != null) 
-				if (AdminHandler.isStealthed(pl.getName(), p))
-					continue;
-
 			if (pl.getName().contains(args[0])) {
 				p = pl;
 				break;
@@ -225,10 +196,6 @@ public class WhosThere extends JavaPlugin{
 		int i = 0;
 		int remainingChars = charsPerLine;
 		for (Player player : getServer().getOnlinePlayers()) {
-			if (limited)
-				if (isStealthed(player.getName(), (Player) sender))
-					continue;
-
 			if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
 				if (remainingChars - player.getName().length() < 0) {
 					playerList += lineBreak;
@@ -305,16 +272,6 @@ public class WhosThere extends JavaPlugin{
 		return message;
 	}
 
-	/*
-	 * Returns whether a player is stealthed or not
-	 * 
-	 */
-	public boolean isStealthed(String player, Player p) {
-		if (admins == null)
-			return false;
-		else
-			return AdminHandler.isStealthed(player, p);
-	}
 
 	private void sendWrappedText(CommandSender sender, String message) {
 		for(String messageLine : message.split(lineBreak)) {
