@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.permission.Permission;
+import net.milkbowl.vault.chat.Chat;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -31,6 +32,7 @@ public class WhosThere extends JavaPlugin{
 	private Logger log = Logger.getLogger("Minecraft");
 	private String plugName; 
 	private Permission perms;
+	private Chat chat;
 
 	private boolean usePrefix = true;
 	private boolean useColorOption = false;
@@ -48,11 +50,13 @@ public class WhosThere extends JavaPlugin{
 		PluginDescriptionFile pdfFile = this.getDescription();
 		plugName = "[" + pdfFile.getName() + "]";
 		//If we can't load dependencies, disable
-		if (!setupDependencies()) {
+		if (!setupPermissions()) {
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-
+		//Setup chat API connection
+		setupChat();
+		
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
 
@@ -66,7 +70,7 @@ public class WhosThere extends JavaPlugin{
 			}
 		}   
 		setupConfiguration();
-		
+
 		this.getServer().getPluginManager().registerEvent(Type.PLAYER_LOGIN, new WhoPlayerListener(this), Priority.Monitor, this);
 		log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
 
@@ -119,7 +123,7 @@ public class WhosThere extends JavaPlugin{
 
 	}
 
-	private boolean setupDependencies() {
+	private boolean setupPermissions() {
 		Collection<RegisteredServiceProvider<Permission>> perms = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.permission.Permission.class);
 		for(RegisteredServiceProvider<Permission> perm : perms) {
 			Permission p = perm.getProvider();
@@ -132,19 +136,33 @@ public class WhosThere extends JavaPlugin{
 		return (this.perms != null);
 	}
 
+	private void setupChat() {
+		Collection<RegisteredServiceProvider<Chat>> chats = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.chat.Chat.class);
+		for (RegisteredServiceProvider<Chat> chat : chats) {
+			Chat c = chat.getProvider();
+			log.info(String.format("[%s] Found Service (Chat) %s", getDescription().getName(), c.getName()));
+		}
+		this.chat = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider();
+		log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.chat.getName()));
+	}
+
 	public boolean has(Player player, String permission) {
 		return this.perms.has(player, permission);
 	}
 
 	public String option(Player player, String permission) {
-		return this.perms.getPlayerInfoString(player, permission, null);
+		if (chat == null)
+			return "";
+		return this.chat.getPlayerInfoString(player, permission, null);
 	}
 
 	/*
 	 * Gets a Permissions Prefix
 	 */
 	public String prefix(Player player) {
-		return this.perms.getPlayerPrefix(player);
+		if (chat == null)
+			return "";
+		return this.chat.getPlayerPrefix(player);
 	}
 
 	private void whois(CommandSender sender, String[] args) {
@@ -169,11 +187,11 @@ public class WhosThere extends JavaPlugin{
 			sender.sendMessage("No player with name " + args[0] + " was found on the server");
 		}
 	}
-	
+
 	private boolean checkOfflinePlayer(String playerName, CommandSender sender) {
 		for (World world : getServer().getWorlds()) {
 			File file = new File(world.getName() + File.separator + "players" + File.separator + playerName + ".dat");
-			
+
 			if (file.exists()) {
 				sender.sendMessage(replaceColors("&aLast Online: &d" + dateFormat.format(new Date(file.lastModified()))));
 				return true;
@@ -181,7 +199,7 @@ public class WhosThere extends JavaPlugin{
 		}
 		return false;
 	}
-	
+
 	/*
 	 * Sends a limited who list to the command sender
 	 * 
@@ -280,13 +298,13 @@ public class WhosThere extends JavaPlugin{
 	}
 
 	public class WhoPlayerListener extends PlayerListener {
-		
+
 		WhosThere plugin;
-		
+
 		public WhoPlayerListener(WhosThere plugin) {
 			this.plugin = plugin;
 		}
-		
+
 		@Override
 		public void onPlayerLogin(PlayerLoginEvent event) {
 			if (displayOnLogin) {
