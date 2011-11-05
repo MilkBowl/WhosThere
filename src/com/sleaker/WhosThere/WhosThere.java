@@ -1,3 +1,9 @@
+/* WhosThere is copyright Nicholas Minkler
+ * WhosThere is licensed under the CreativeCommons - Non-Commercial - No-Derivatives license 
+ * It can be viewed at the following link
+ * 
+ * http://creativecommons.org/licenses/by-nc-nd/3.0/
+ */
 package com.sleaker.WhosThere;
 
 import java.io.File;
