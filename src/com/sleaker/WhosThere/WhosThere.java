@@ -93,7 +93,7 @@ public class WhosThere extends JavaPlugin{
 				}
 			} 
 			//If this is Console, or a Player with Administrate priveledges they will see this message
-			whoCommand(sender, args, false);
+			whoCommand(sender, args);
 			return true;
 		} else if (command.getName().equalsIgnoreCase("whois")) {
 			if (sender instanceof Player) {
@@ -210,7 +210,7 @@ public class WhosThere extends JavaPlugin{
 	 * Sends a limited who list to the command sender
 	 * 
 	 */
-	private void whoCommand(CommandSender sender, String[] args, boolean limited) {
+	private void whoCommand(CommandSender sender, String[] args) {
 
 		World world = null;
 		if (args.length > 0) {
