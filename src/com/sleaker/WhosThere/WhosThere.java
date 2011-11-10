@@ -21,6 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -29,17 +30,13 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 
 public class WhosThere extends JavaPlugin{
-
-	public Configuration config;
 
 	private Logger log = Logger.getLogger("Minecraft");
 	private String plugName; 
 	private Permission perms;
 	private Chat chat;
-
 	private boolean usePrefix = true;
 	private boolean useColorOption = false;
 	private boolean displayOnLogin = false;
@@ -114,19 +111,13 @@ public class WhosThere extends JavaPlugin{
 	}
 
 	private void setupConfiguration() {
-		config = getConfiguration();
-		if (config.getKeys(null).isEmpty()) {
-			config.setProperty("use-prefix", usePrefix);
-			config.setProperty("use-color-option", useColorOption);
-			config.setProperty("color-option-name", colorOption);
-			config.setProperty("display-on-login", displayOnLogin);
-		}
+		FileConfiguration config = getConfig();
+		config.options().copyDefaults(true);
+		saveConfig();
 		usePrefix = config.getBoolean("use-prefix", usePrefix);
 		useColorOption = config.getBoolean("use-color-option", useColorOption);
 		colorOption = config.getString("color-option-name", colorOption);
 		displayOnLogin = config.getBoolean("display-on-login", displayOnLogin);
-		config.save();
-
 	}
 
 	private boolean setupPermissions() {

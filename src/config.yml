@@ -1,0 +1,4 @@
+use-prefix: true
+use-color-option: false
+display-on-login: false
+color-option-name: InfoNode
