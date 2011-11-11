@@ -59,7 +59,7 @@ public class WhosThere extends JavaPlugin{
 		}
 		//Setup chat API connection
 		setupChat();
-		
+
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
 
@@ -121,30 +121,19 @@ public class WhosThere extends JavaPlugin{
 	}
 
 	private boolean setupPermissions() {
-		Collection<RegisteredServiceProvider<Permission>> perms = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.permission.Permission.class);
-		for(RegisteredServiceProvider<Permission> perm : perms) {
-			Permission p = perm.getProvider();
-			log.info(String.format("[%s] Found Service (Permission) %s", getDescription().getName(), p.getName()));
-		}
-
-		this.perms = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
-		log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.perms.getName()));
-
-		return (this.perms != null);
+        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (permissionProvider != null) {
+            perms = permissionProvider.getProvider();
+        }
+        return (perms != null);
 	}
 
 	private void setupChat() {
-		Collection<RegisteredServiceProvider<Chat>> chats = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.chat.Chat.class);
-		if (chats.isEmpty())
-			return;
-		
-		for (RegisteredServiceProvider<Chat> chat : chats) {
-			Chat c = chat.getProvider();
-			log.info(String.format("[%s] Found Service (Chat) %s", getDescription().getName(), c.getName()));
+		RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
+		if (chatProvider != null) {
+			this.chat = chatProvider.getProvider();
+			log.info(String.format("[%s] Using Chat Provider %s", getDescription().getName(), this.chat.getName()));
 		}
-		
-		this.chat = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider();
-		log.info(String.format("[%s] Using Chat Provider %s", getDescription().getName(), this.chat.getName()));
 	}
 
 	public boolean has(Player player, String permission) {
