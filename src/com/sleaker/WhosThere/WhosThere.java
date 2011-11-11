@@ -135,12 +135,16 @@ public class WhosThere extends JavaPlugin{
 
 	private void setupChat() {
 		Collection<RegisteredServiceProvider<Chat>> chats = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.chat.Chat.class);
+		if (chats.isEmpty())
+			return;
+		
 		for (RegisteredServiceProvider<Chat> chat : chats) {
 			Chat c = chat.getProvider();
 			log.info(String.format("[%s] Found Service (Chat) %s", getDescription().getName(), c.getName()));
 		}
+		
 		this.chat = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class).getProvider();
-		log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), this.chat.getName()));
+		log.info(String.format("[%s] Using Chat Provider %s", getDescription().getName(), this.chat.getName()));
 	}
 
 	public boolean has(Player player, String permission) {

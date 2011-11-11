@@ -29,12 +29,13 @@
     	<echo>Compiling</echo>
         <javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" includeantruntime="false" />
     	<copy file="src/plugin.yml" tofile="bin/plugin.yml" />
+    	<copy file="src/config.yml" tofile="bin/config.yml" />
     	<replace file="bin/plugin.yml" token="b000" value="b${env.BUILD_NUMBER}" />
     </target>
   
   <target name="compress" description="Compression target">
   		<echo>Compressing</echo>
-        <jar jarfile="WhosThere.jar" basedir="bin" includes="**/*, plugin.yml">
+        <jar jarfile="WhosThere.jar" basedir="bin" includes="**/*, plugin.yml, config.yml">
 		<manifest>
 			<attribute name="Built-By" value="${user.name}" />
 		</manifest>
