@@ -2,3 +2,5 @@ use-prefix: true
 use-color-option: false
 display-on-login: false
 color-option-name: InfoNode
+prefix-tab-name: true
+color-option-tab-name: false

@@ -9,7 +9,6 @@ package com.sleaker.WhosThere;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -40,6 +39,8 @@ public class WhosThere extends JavaPlugin{
 	private boolean usePrefix = true;
 	private boolean useColorOption = false;
 	private boolean displayOnLogin = false;
+	private boolean prefixTabName = true;
+	private boolean colorOptionTabName = false;
 	private String colorOption = "namecolor";
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - MMM, dd");
 	private static final int charsPerLine = 52;
@@ -118,6 +119,8 @@ public class WhosThere extends JavaPlugin{
 		useColorOption = config.getBoolean("use-color-option", useColorOption);
 		colorOption = config.getString("color-option-name", colorOption);
 		displayOnLogin = config.getBoolean("display-on-login", displayOnLogin);
+		prefixTabName = config.getBoolean("prefix-tab-name", prefixTabName);
+		colorOptionTabName = config.getBoolean("color-option-tab-name", colorOptionTabName);
 	}
 
 	private boolean setupPermissions() {
@@ -253,6 +256,24 @@ public class WhosThere extends JavaPlugin{
 		message += p.getName();
 		return replaceColors(message);
 	}
+	
+	/**
+	 * Add colorization based on options selected to the tabname
+	 * 
+	 * @param p
+	 * @return
+	 */
+	private String colorizeTabName (Player p) {
+		String message = "";
+		if (prefixTabName) {
+			message += prefix(p);
+		}
+		if (colorOptionTabName && colorOption != "" && colorOption != null) {
+			message += option(p, colorOption);
+		}
+		message += p.getName();
+		return replaceColors(message);
+	}
 
 	/**
 	 * Takes a string and replaces &# color codes with ChatColors
@@ -297,9 +318,12 @@ public class WhosThere extends JavaPlugin{
 
 		@Override
 		public void onPlayerLogin(PlayerLoginEvent event) {
+			Player player = event.getPlayer();
 			if (displayOnLogin) {
-				plugin.getServer().getPluginCommand("who").execute(event.getPlayer(), "who", new String[0]);
+				plugin.getServer().getPluginCommand("who").execute(player, "who", new String[0]);
 			}
+			if (prefixTabName || colorOptionTabName)
+				player.setPlayerListName(colorizeTabName(player));
 		}
 	}
 }
