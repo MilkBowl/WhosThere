@@ -286,23 +286,22 @@ public class WhosThere extends JavaPlugin{
 	 * @return
 	 */
 	private String replaceColors (String message) {
-		message = message.replaceAll("&0", ChatColor.BLACK + "");
-		message = message.replaceAll("&1", ChatColor.DARK_BLUE + "");
-		message = message.replaceAll("&2", ChatColor.DARK_GREEN + "");
-		message = message.replaceAll("&3", ChatColor.DARK_AQUA + "");
-		message = message.replaceAll("&4", ChatColor.DARK_RED + "");
-		message = message.replaceAll("&5", ChatColor.DARK_PURPLE + "");
-		message = message.replaceAll("&6", ChatColor.GOLD + "");
-		message = message.replaceAll("&7", ChatColor.GRAY + "");
-		message = message.replaceAll("&8", ChatColor.DARK_GRAY + "");
-		message = message.replaceAll("&9", ChatColor.BLUE + "");
-		message = message.replaceAll("(?i)&a", ChatColor.GREEN + "");
-		message = message.replaceAll("(?i)&b", ChatColor.AQUA + "");
-		message = message.replaceAll("(?i)&c", ChatColor.RED + "");
-		message = message.replaceAll("(?i)&d", ChatColor.LIGHT_PURPLE + "");
-		message = message.replaceAll("(?i)&e", ChatColor.YELLOW + "");
-		message = message.replaceAll("(?i)&f", ChatColor.WHITE + "");
-		return message;
+		return message.replaceAll("&0", ChatColor.BLACK + "")
+			.replaceAll("&1", ChatColor.DARK_BLUE + "")
+			.replaceAll("&2", ChatColor.DARK_GREEN + "")
+			.replaceAll("&3", ChatColor.DARK_AQUA + "")
+			.replaceAll("&4", ChatColor.DARK_RED + "")
+			.replaceAll("&5", ChatColor.DARK_PURPLE + "")
+			.replaceAll("&6", ChatColor.GOLD + "")
+			.replaceAll("&7", ChatColor.GRAY + "")
+			.replaceAll("&8", ChatColor.DARK_GRAY + "")
+			.replaceAll("&9", ChatColor.BLUE + "")
+			.replaceAll("(?i)&a", ChatColor.GREEN + "")
+			.replaceAll("(?i)&b", ChatColor.AQUA + "")
+			.replaceAll("(?i)&c", ChatColor.RED + "")
+			.replaceAll("(?i)&d", ChatColor.LIGHT_PURPLE + "")
+			.replaceAll("(?i)&e", ChatColor.YELLOW + "")
+			.replaceAll("(?i)&f", ChatColor.WHITE + "");
 	}
 
 
