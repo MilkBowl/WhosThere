@@ -59,7 +59,9 @@ public class WhosThere extends JavaPlugin{
 			return;
 		}
 		//Setup chat API connection
-		setupChat();
+		if (!setupChat()) {
+			log.warning(plugName + " - No Info/Chat plugin found! Colorization and Prefix options will not work!");
+		}
 
 		//Check to see if there is a configuration file.
 		File yml = new File(getDataFolder()+"/config.yml");
@@ -131,12 +133,13 @@ public class WhosThere extends JavaPlugin{
         return (perms != null);
 	}
 
-	private void setupChat() {
+	private boolean setupChat() {
 		RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
 		if (chatProvider != null) {
 			this.chat = chatProvider.getProvider();
 			log.info(String.format("[%s] Using Chat Provider %s", getDescription().getName(), this.chat.getName()));
 		}
+		return chat != null;
 	}
 
 	public boolean has(Player player, String permission) {
@@ -146,7 +149,7 @@ public class WhosThere extends JavaPlugin{
 	public String option(Player player, String permission) {
 		if (chat == null)
 			return "";
-		return this.chat.getPlayerInfoString(player, permission, null);
+		return this.chat.getPlayerInfoString(player, permission, "");
 	}
 
 	/*
@@ -155,7 +158,8 @@ public class WhosThere extends JavaPlugin{
 	public String prefix(Player player) {
 		if (chat == null)
 			return "";
-		return this.chat.getPlayerPrefix(player);
+		String prefix =  this.chat.getPlayerPrefix(player);
+		return prefix != null ? prefix : "";
 	}
 
 	private void whois(CommandSender sender, String[] args) {
