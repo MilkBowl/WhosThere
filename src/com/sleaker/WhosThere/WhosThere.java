@@ -350,11 +350,14 @@ public class WhosThere extends JavaPlugin{
 		"&&&1tripple pound test"
 		};
 		for (int i = 0; i < cases.length; i++) {
+			sender.sendMessage("Regexing: " + replaceColorsRegex(cases[i]));
 			sender.sendMessage("Case" + (i+1) + " Regex took: " + colorTestRegex(cases[i]) + " nanoseconds." );
+			sender.sendMessage("Loop replacing: " + replaceColors(cases[i]));
 			sender.sendMessage("Case" + (i+1) + " SimpleReplace took: " + colorTest(cases[i]) + " nanoseconds." );
 		}
 		return true;
 	}
+	
 	private long colorTestRegex(String s) {
 		String newMessage = null;
 		long startTime = System.nanoTime();
