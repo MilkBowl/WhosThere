@@ -10,3 +10,5 @@ commands:
     whois:
         aliases: [ seen ]
         description: get detailed information about a user.
+    testcolor:
+        description: test color parsing
