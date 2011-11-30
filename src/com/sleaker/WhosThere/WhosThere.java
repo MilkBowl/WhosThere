@@ -325,8 +325,12 @@ public class WhosThere extends JavaPlugin{
 			if (displayOnLogin) {
 				plugin.getServer().getPluginCommand("who").execute(player, "who", new String[0]);
 			}
-			if (prefixTabName || colorOptionTabName)
-				player.setPlayerListName(colorizeTabName(player));
+			if (prefixTabName || colorOptionTabName) {
+				String listName = colorizeTabName(player);
+				if (listName.length() > 16)
+					listName = listName.substring(0, 15);
+				player.setPlayerListName(listName);
+			}
 		}
 	}
 }
