@@ -308,7 +308,7 @@ public class WhosThere extends JavaPlugin{
 	}
 	
 	private String replaceColorsRegex(String string) {
-		return string.replaceAll("&([a-z0-9])", "\u00A7$1");
+		return string.replaceAll("(?i)&([a-z0-9])", "\u00A7$1");
 	}
 
 
