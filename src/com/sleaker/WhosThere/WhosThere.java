@@ -286,22 +286,23 @@ public class WhosThere extends JavaPlugin{
 	 * @return
 	 */
 	private String replaceColors (String message) {
-		return message.replaceAll("&0", ChatColor.BLACK + "")
-			.replaceAll("&1", ChatColor.DARK_BLUE + "")
-			.replaceAll("&2", ChatColor.DARK_GREEN + "")
-			.replaceAll("&3", ChatColor.DARK_AQUA + "")
-			.replaceAll("&4", ChatColor.DARK_RED + "")
-			.replaceAll("&5", ChatColor.DARK_PURPLE + "")
-			.replaceAll("&6", ChatColor.GOLD + "")
-			.replaceAll("&7", ChatColor.GRAY + "")
-			.replaceAll("&8", ChatColor.DARK_GRAY + "")
-			.replaceAll("&9", ChatColor.BLUE + "")
-			.replaceAll("(?i)&a", ChatColor.GREEN + "")
-			.replaceAll("(?i)&b", ChatColor.AQUA + "")
-			.replaceAll("(?i)&c", ChatColor.RED + "")
-			.replaceAll("(?i)&d", ChatColor.LIGHT_PURPLE + "")
-			.replaceAll("(?i)&e", ChatColor.YELLOW + "")
-			.replaceAll("(?i)&f", ChatColor.WHITE + "");
+		String newMessage = "";
+		for (int i = 0; i < message.length(); i++) {
+			char c = message.charAt(i);
+			if (c != '&') {
+				newMessage += c;
+				continue;
+			} 
+			try {
+				Integer in = Integer.parseInt(message.substring(i+1, i+2), 16);
+				message += ChatColor.getByCode(in);
+				i++;
+			} catch (NumberFormatException e) {
+				newMessage += c;
+				continue;
+			}
+		}
+		return newMessage;
 	}
 
 
