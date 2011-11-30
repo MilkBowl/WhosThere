@@ -109,8 +109,6 @@ public class WhosThere extends JavaPlugin{
 				whois(sender, args);
 				return true;
 			}
-		} else if (command.getName().equalsIgnoreCase("testcolor")) {
-			return (colorTestCommand(sender));
 		}
 		return false;
 	}
@@ -288,27 +286,7 @@ public class WhosThere extends JavaPlugin{
 	 * @return
 	 */
 	private String replaceColors (String message) {
-		String newMessage = "";
-		for (int i = 0; i < message.length(); i++) {
-			char c = message.charAt(i);
-			if (c != '&') {
-				newMessage += c;
-				continue;
-			} 
-			try {
-				Integer in = Integer.parseInt(message.substring(i+1, i+2), 16);
-				message += ChatColor.getByCode(in);
-				i++;
-			} catch (NumberFormatException e) {
-				newMessage += c;
-				continue;
-			}
-		}
-		return newMessage;
-	}
-	
-	private String replaceColorsRegex(String string) {
-		return string.replaceAll("(?i)&([a-z0-9])", "\u00A7$1");
+		return message.replaceAll("(?i)&([a-f0-9])", "\u00A7$1");
 	}
 
 
@@ -339,40 +317,5 @@ public class WhosThere extends JavaPlugin{
 				player.setPlayerListName(listName);
 			}
 		}
-	}
-	private boolean colorTestCommand(CommandSender sender) {
-		String[] cases = new String[] {
-		"&a Test &1 string &61", 
-		"&fTest &1string &42 is lon&Eger",
-		"&A&A&A&A&AHigh frequency single replacement in a longer string message for parse testing purposes.",
-		"&4small",
-		"&himproper match &Ztest",
-		"&&&1tripple pound test"
-		};
-		for (int i = 0; i < cases.length; i++) {
-			sender.sendMessage("Regexing: " + replaceColorsRegex(cases[i]));
-			sender.sendMessage("Case" + (i+1) + " Regex took: " + colorTestRegex(cases[i]) + " nanoseconds." );
-			sender.sendMessage("Loop replacing: " + replaceColors(cases[i]));
-			sender.sendMessage("Case" + (i+1) + " SimpleReplace took: " + colorTest(cases[i]) + " nanoseconds." );
-		}
-		return true;
-	}
-	
-	private long colorTestRegex(String s) {
-		String newMessage = null;
-		long startTime = System.nanoTime();
-		for (int i = 0; i < 10000; i++) {
-			newMessage = replaceColorsRegex(s);
-		}
-		return (System.nanoTime() - startTime) / 10000;
-	}
-	
-	private long colorTest(String s) {
-		String newMessage = null;
-		long startTime = System.nanoTime();
-		for (int i = 0; i < 10000; i++) {
-			newMessage = replaceColors(s);
-		}
-		return (System.nanoTime() - startTime) / 10000;
 	}
 }
