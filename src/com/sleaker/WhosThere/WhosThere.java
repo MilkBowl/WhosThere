@@ -24,8 +24,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -77,7 +77,7 @@ public class WhosThere extends JavaPlugin{
 		}   
 		setupConfiguration();
 
-		this.getServer().getPluginManager().registerEvent(Type.PLAYER_LOGIN, new WhoPlayerListener(this), Priority.Monitor, this);
+		this.getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, new WhoPlayerListener(this), Priority.Monitor, this);
 		log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
 
 	}
@@ -305,7 +305,7 @@ public class WhosThere extends JavaPlugin{
 		}
 
 		@Override
-		public void onPlayerLogin(PlayerLoginEvent event) {
+		public void onPlayerJoin(PlayerJoinEvent event) {
 			Player player = event.getPlayer();
 			if (displayOnLogin) {
 				plugin.getServer().getPluginCommand("who").execute(player, "who", new String[0]);
