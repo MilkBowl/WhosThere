@@ -5,6 +5,7 @@
 
     <path id="classpath">
         <fileset dir="lib" includes="**/*.jar"/>
+    	<fileset dir="../../Vault/lastSuccessful/archive" includes="**/*.jar" />
     </path>
 
     <target name="jar" depends="main" />
@@ -20,9 +21,6 @@
 	</delete>
 	<delete file="WhosThere.jar" />
 	<mkdir dir="bin"/>
-	<echo>Retreiving Libraries</echo>
-        <get src="http://ci.milkbowl.net/job/Vault/lastSuccessfulBuild/artifact/Vault.jar"
-        	dest="lib/Vault.jar" verbose="false" usetimestamp="true" />
     </target>
   
     <target name="compile" description="Compilation target">
