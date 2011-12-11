@@ -158,7 +158,7 @@ public class WhosThere extends JavaPlugin{
 	public String prefix(Player player) {
 		if (chat == null)
 			return "";
-		String prefix =  this.chat.getPlayerPrefix(player);
+		String prefix = this.chat.getPlayerPrefix(player);
 		return prefix != null ? prefix : "";
 	}
 
@@ -306,9 +306,16 @@ public class WhosThere extends JavaPlugin{
 
 		@Override
 		public void onPlayerJoin(PlayerJoinEvent event) {
-			Player player = event.getPlayer();
+			final Player player = event.getPlayer();
+			
 			if (displayOnLogin) {
-				plugin.getServer().getPluginCommand("who").execute(player, "who", new String[0]);
+			    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        plugin.getServer().getPluginCommand("who").execute(player, "who", new String[0]);
+                    }
+			    }, 1L);
+				
 			}
 			if (prefixTabName || colorOptionTabName) {
 				String listName = colorizeTabName(player);

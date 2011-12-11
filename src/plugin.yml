@@ -2,7 +2,7 @@ name: WhosThere
 main: com.sleaker.WhosThere.WhosThere
 author: Sleaker
 version: 1.4.4-b000
-depend: [Vault]
+depend: [ Vault ]
 commands:
     who:
         aliases: [ list, players, online, playerlist]
