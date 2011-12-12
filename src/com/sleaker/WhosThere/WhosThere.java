@@ -15,8 +15,10 @@ import java.util.logging.Logger;
 import net.milkbowl.vault.permission.Permission;
 import net.milkbowl.vault.chat.Chat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -186,15 +188,13 @@ public class WhosThere extends JavaPlugin{
 	}
 
 	private boolean checkOfflinePlayer(String playerName, CommandSender sender) {
-		for (World world : getServer().getWorlds()) {
-			File file = new File(world.getName() + File.separator + "players" + File.separator + playerName + ".dat");
-
-			if (file.exists()) {
-				sender.sendMessage(replaceColors("&aLast Online: &d" + dateFormat.format(new Date(file.lastModified()))));
-				return true;
-			}
-		}
-		return false;
+	    OfflinePlayer op = Bukkit.getServer().getOfflinePlayer(playerName);
+	    if (op == null)
+	        return false;
+	    else {
+	        sender.sendMessage(replaceColors("&aLast Online: &d" + dateFormat.format(new Date(op.getLastPlayed()))));
+	        return true;
+	    }
 	}
 
 	/*
