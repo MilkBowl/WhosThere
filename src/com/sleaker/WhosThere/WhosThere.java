@@ -6,16 +6,14 @@
  */
 package com.sleaker.WhosThere;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import net.milkbowl.vault.permission.Permission;
 import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -69,19 +67,6 @@ public class WhosThere extends JavaPlugin{
         if (!setupChat()) {
             log.warning(plugName + " - No Info/Chat plugin found! Colorization and Prefix options will not work!");
         }
-
-        //Check to see if there is a configuration file.
-        File yml = new File(getDataFolder()+"/config.yml");
-
-        if (!yml.exists()) {
-            new File(getDataFolder().toString()).mkdir();
-            try {
-                yml.createNewFile();
-            }
-            catch (IOException ex) {
-                log.info(plugName + " - Cannot create configuration file. And none to load, using defaults.");
-            }
-        }   
         setupConfiguration();
 
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, new WhoPlayerListener(this), Priority.Monitor, this);
@@ -204,12 +189,14 @@ public class WhosThere extends JavaPlugin{
 
     /*
      * Sends a limited who list to the command sender
-     * 
      */
     private void whoCommand(CommandSender sender, String[] args) {
-
         World world = null;
         if (args.length > 0) {
+            if (args[0].equalsIgnoreCase("staff")) {
+                whoStaff(sender);
+                return;
+            }
             world = getServer().getWorld(args[0]);
         }
         String playerList = "";
@@ -237,7 +224,7 @@ public class WhosThere extends JavaPlugin{
         } else if (i == 0 && world != null) {
             sender.sendMessage("No players were found on " + world.getName());
         }  else if (args.length == 0) {
-            String message = ChatColor.WHITE + "There are " + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online:" + lineBreak + playerList;
+            String message = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online:" + lineBreak + playerList;
             sendWrappedText(sender, message);
         } else if (world != null) {
             String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ":" + lineBreak + playerList;
@@ -248,6 +235,39 @@ public class WhosThere extends JavaPlugin{
         }
     }
 
+    /**
+     * Performs a list of who online is staff
+     * @param sender
+     * @param args
+     */
+    private void whoStaff(CommandSender sender) {
+        String playerList = "";
+        int i = 0;
+        int remainingChars = charsPerLine;
+        for (Player player : onlinePlayers) {
+            if (player.hasPermission("whosthere.staff")) {
+                if (remainingChars - player.getName().length() < 0) {
+                    playerList += lineBreak;
+                    remainingChars = charsPerLine;
+                }
+                //Normalize our color in case we have bleed-through
+                playerList += ChatColor.WHITE;
+                //If this isn't a newline lets put in our spacer
+                if (remainingChars != charsPerLine)
+                    playerList += "  ";
+                //Add the colorized playername to the list
+                playerList += colorize(player);
+                remainingChars -= (player.getName().length() + 2);
+                i++;
+            }
+        } if (i == 0) {
+            sender.sendMessage("No staff ar currently online!");
+        } else {
+            String message = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + ChatColor.WHITE + " staff online:" + lineBreak + playerList;
+            sendWrappedText(sender, message);
+        } 
+    }
+    
     /**
      * Add colorization based on options selected
      * 

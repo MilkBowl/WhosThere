@@ -10,3 +10,16 @@ commands:
     whois:
         aliases: [ seen ]
         description: get detailed information about a user.
+permissions:
+  whosthere.whois:
+    default: op
+    description: Allows a player to get information on when a player was last online.
+  whosthere.admin:
+    default: op
+    description: Displays IP address and other information about a player when using whois
+  whosthere.who:
+    default: true
+    description: Allows a player to get a list of all online players
+  whosthere.staff:
+    default: op
+    description: Anyone with this permission will show up in the staff list
