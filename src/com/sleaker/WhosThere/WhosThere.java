@@ -24,10 +24,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -69,7 +69,7 @@ public class WhosThere extends JavaPlugin{
         }
         setupConfiguration();
 
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, new WhoPlayerListener(this), Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvents(new WhoPlayerListener(this), this);
         log.info(plugName + " - " + pdfFile.getVersion() + " by Sleaker is enabled!");
 
     }
@@ -329,7 +329,7 @@ public class WhosThere extends JavaPlugin{
         }
     }
     
-    public class WhoPlayerListener extends PlayerListener {
+    public class WhoPlayerListener implements Listener {
 
         WhosThere plugin;
 
@@ -337,7 +337,7 @@ public class WhosThere extends JavaPlugin{
             this.plugin = plugin;
         }
 
-        @Override
+        @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerJoin(PlayerJoinEvent event) {
             final Player player = event.getPlayer();
             onlinePlayers.add(player);
@@ -359,7 +359,7 @@ public class WhosThere extends JavaPlugin{
             }
         }
 
-        @Override
+        @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerQuit(PlayerQuitEvent event) {
             onlinePlayers.remove(event.getPlayer());
         }
