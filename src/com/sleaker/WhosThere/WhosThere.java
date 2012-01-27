@@ -9,6 +9,7 @@ package com.sleaker.WhosThere;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -159,7 +160,13 @@ public class WhosThere extends JavaPlugin{
         if (sender instanceof Player)
             p = (Player) sender;
 
-        for (Player pl : onlinePlayers) {
+        Iterator<Player> iter = onlinePlayers.iterator();
+        while (iter.hasNext()) {
+            Player pl = iter.next();
+            if (!pl.isOnline()) {
+                iter.remove();
+                continue;
+            }
             if (pl.getName().contains(args[0])) {
                 p = pl;
                 break;
@@ -202,7 +209,13 @@ public class WhosThere extends JavaPlugin{
         String playerList = "";
         int i = 0;
         int remainingChars = charsPerLine;
-        for (Player player : onlinePlayers) {
+        Iterator<Player> iter = onlinePlayers.iterator();
+        while(iter.hasNext()) {
+            Player player = iter.next();
+            if (!player.isOnline()) {
+                iter.remove();
+                continue;
+            }
             if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += lineBreak;
@@ -244,7 +257,13 @@ public class WhosThere extends JavaPlugin{
         String playerList = "";
         int i = 0;
         int remainingChars = charsPerLine;
-        for (Player player : onlinePlayers) {
+        Iterator<Player> iter = onlinePlayers.iterator();
+        while (iter.hasNext()) {
+            Player player = iter.next();
+            if (!player.isOnline()) {
+                iter.remove();
+                continue;
+            }
             if (player.hasPermission("whosthere.staff")) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += lineBreak;
