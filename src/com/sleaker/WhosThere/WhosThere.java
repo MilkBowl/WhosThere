@@ -157,8 +157,9 @@ public class WhosThere extends JavaPlugin{
 
     private void whois(CommandSender sender, String[] args) {
         Player p = null;
-        if (sender instanceof Player)
+        if (sender instanceof Player) {
             p = (Player) sender;
+        }
 
         Iterator<Player> iter = onlinePlayers.iterator();
         while (iter.hasNext()) {
@@ -175,8 +176,9 @@ public class WhosThere extends JavaPlugin{
         if (p != null) {
             Location pLoc = p.getLocation();
             sender.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
-            if (sender instanceof Player && !has((Player) sender, "whosthere.admin")) 
+            if (sender instanceof Player && !has((Player) sender, "whosthere.admin"))  {
                 return;
+            }
             sender.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
             sender.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
         } else if (!checkOfflinePlayer(args[0], sender)) {
