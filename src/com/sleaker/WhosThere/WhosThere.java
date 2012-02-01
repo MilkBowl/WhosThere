@@ -9,8 +9,6 @@ package com.sleaker.WhosThere;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.chat.Chat;
@@ -29,7 +27,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -49,8 +46,6 @@ public class WhosThere extends JavaPlugin{
     private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - MMM, dd");
     private static final int charsPerLine = 52;
     private static final String lineBreak = "%LB%";
-    private final PlayerComparator pComp = new PlayerComparator();
-    private TreeSet<Player> onlinePlayers = new TreeSet<Player>(pComp);
 
     public void onDisable() {
         log.info(plugName + " Disabled");
@@ -161,13 +156,7 @@ public class WhosThere extends JavaPlugin{
             p = (Player) sender;
         }
 
-        Iterator<Player> iter = onlinePlayers.iterator();
-        while (iter.hasNext()) {
-            Player pl = iter.next();
-            if (!pl.isOnline()) {
-                iter.remove();
-                continue;
-            }
+        for (Player pl : Bukkit.getServer().getOnlinePlayers()) {
             if (pl.getName().contains(args[0])) {
                 p = pl;
                 break;
@@ -211,13 +200,7 @@ public class WhosThere extends JavaPlugin{
         String playerList = "";
         int i = 0;
         int remainingChars = charsPerLine;
-        Iterator<Player> iter = onlinePlayers.iterator();
-        while(iter.hasNext()) {
-            Player player = iter.next();
-            if (!player.isOnline()) {
-                iter.remove();
-                continue;
-            }
+        for(Player player : Bukkit.getOnlinePlayers()) {
             if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += lineBreak;
@@ -259,13 +242,8 @@ public class WhosThere extends JavaPlugin{
         String playerList = "";
         int i = 0;
         int remainingChars = charsPerLine;
-        Iterator<Player> iter = onlinePlayers.iterator();
-        while (iter.hasNext()) {
-            Player player = iter.next();
-            if (!player.isOnline()) {
-                iter.remove();
-                continue;
-            }
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("whosthere.staff")) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += lineBreak;
@@ -361,8 +339,6 @@ public class WhosThere extends JavaPlugin{
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerJoin(PlayerJoinEvent event) {
             final Player player = event.getPlayer();
-            onlinePlayers.add(player);
-            
             if (displayOnLogin) {
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                     @Override
@@ -378,11 +354,6 @@ public class WhosThere extends JavaPlugin{
                     listName = listName.substring(0, 15);
                 player.setPlayerListName(listName);
             }
-        }
-
-        @EventHandler(priority = EventPriority.MONITOR)
-        public void onPlayerQuit(PlayerQuitEvent event) {
-            onlinePlayers.remove(event.getPlayer());
         }
     }
 }
