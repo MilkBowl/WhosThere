@@ -157,7 +157,7 @@ public class WhosThere extends JavaPlugin{
 
     private void whois(CommandSender sender, String[] args) {
         Player p = null;
-        if (sender instanceof Player) {
+        if (sender instanceof Player && args.length == 0) {
             p = (Player) sender;
         }
 
