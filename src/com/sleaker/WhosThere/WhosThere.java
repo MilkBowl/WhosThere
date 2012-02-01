@@ -271,14 +271,14 @@ public class WhosThere extends JavaPlugin{
                     playerList += lineBreak;
                     remainingChars = charsPerLine;
                 }
-                //Normalize our color in case we have bleed-through
-                playerList += ChatColor.WHITE;
                 //If this isn't a newline lets put in our spacer
                 if (remainingChars != charsPerLine)
                     playerList += "  ";
                 //Add the colorized playername to the list
                 playerList += colorize(player);
                 remainingChars -= (player.getName().length() + 2);
+                //Normalize our color in case we have bleed-through
+                playerList += ChatColor.WHITE;
                 i++;
             }
         } if (i == 0) {
