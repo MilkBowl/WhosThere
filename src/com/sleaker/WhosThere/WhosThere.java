@@ -162,6 +162,14 @@ public class WhosThere extends JavaPlugin{
                 break;
             }
         }
+        if (p == null) {
+            for (Player pl : Bukkit.getServer().getOnlinePlayers()) {
+                if (pl.getDisplayName().toLowerCase().contains(args[0])) {
+                    p = pl;
+                    break;
+                }
+            }
+        }
         if (p != null) {
             Location pLoc = p.getLocation();
             sender.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
@@ -266,7 +274,7 @@ public class WhosThere extends JavaPlugin{
             sendWrappedText(sender, message);
         } 
     }
-    
+
     /**
      * Add colorization based on options selected
      * 
@@ -327,7 +335,7 @@ public class WhosThere extends JavaPlugin{
             return p1.getName().compareTo(p2.getName());
         }
     }
-    
+
     public class WhoPlayerListener implements Listener {
 
         WhosThere plugin;
