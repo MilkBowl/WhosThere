@@ -43,7 +43,7 @@ public class WhosThere extends JavaPlugin{
     private boolean prefixTabName = true;
     private boolean colorOptionTabName = false;
     private String colorOption = "namecolor";
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - MMM, dd");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM, dd - HH:mm");
     private static final int charsPerLine = 52;
     private static final String lineBreak = "%LB%";
 
@@ -177,6 +177,8 @@ public class WhosThere extends JavaPlugin{
                 return;
             }
             sender.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
+            long temp = p.getFirstPlayed();
+            sender.sendMessage(replaceColors("&aFirst Online: &d" + (temp != 0 ? dateFormat.format(new Date(temp)) : " unknown")));
             sender.sendMessage(replaceColors("&aIP: &d" + p.getAddress().getAddress().getHostAddress().toString()));
         } else if (!checkOfflinePlayer(args[0], sender)) {
             sender.sendMessage("No player with name " + args[0] + " was found on the server");
@@ -188,7 +190,10 @@ public class WhosThere extends JavaPlugin{
         if (op == null)
             return false;
         else {
-            sender.sendMessage(replaceColors("&aLast Online: &d" + dateFormat.format(new Date(op.getLastPlayed()))));
+            long temp = op.getFirstPlayed();
+            sender.sendMessage(replaceColors("&aFirst Online: &d" + (temp != 0 ? dateFormat.format(new Date(temp)) : " unknown")));
+            temp = op.getLastPlayed();
+            sender.sendMessage(replaceColors("&aLast Online: &d" + (temp != 0 ? dateFormat.format(new Date(temp)) : " unknown")));
             return true;
         }
     }
