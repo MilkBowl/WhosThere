@@ -187,7 +187,7 @@ public class WhosThere extends JavaPlugin{
 
     private boolean checkOfflinePlayer(String playerName, CommandSender sender) {
         OfflinePlayer op = Bukkit.getServer().getOfflinePlayer(playerName);
-        if (op == null)
+        if (op == null || !op.hasPlayedBefore())
             return false;
         else {
             long temp = op.getFirstPlayed();
