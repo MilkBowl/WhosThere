@@ -323,7 +323,7 @@ public class WhosThere extends JavaPlugin{
      * @return
      */
     private String replaceColors (String message) {
-        return message.replaceAll("(?i)&([a-f0-9])", "\u00A7$1");
+        return message.replaceAll("(?i)&([a-fk0-9])", "\u00A7$1");
     }
 
 
