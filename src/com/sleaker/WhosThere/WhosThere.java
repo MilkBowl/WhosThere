@@ -7,8 +7,10 @@
 package com.sleaker.WhosThere;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.chat.Chat;
@@ -44,8 +46,9 @@ public class WhosThere extends JavaPlugin{
     private boolean colorOptionTabName = false;
     private String colorOption = "namecolor";
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM, dd - HH:mm");
-    private static final int charsPerLine = 52;
-    private static final String lineBreak = "%LB%";
+    private static final int CHARS_PER_LINE = 52;
+    private static final int LINES_PER_PAGE = 7;
+    private static final String LINE_BREAK = "%LB%";
 
     public void onDisable() {
         log.info(plugName + " Disabled");
@@ -203,26 +206,43 @@ public class WhosThere extends JavaPlugin{
      */
     private void whoCommand(CommandSender sender, String[] args) {
         World world = null;
+        int page = 1;
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("staff")) {
-                whoStaff(sender);
+                whoStaff(sender, args);
                 return;
             }
             world = getServer().getWorld(args[0]);
+            if (world == null) {
+                try {
+                    Integer val = Integer.parseInt(args[0]);
+                    page = val;
+                } catch (NumberFormatException e) {
+                    // Ignore an exception here
+                }
+            }
+        } 
+        if (args.length > 1) {
+            try {
+                Integer val = Integer.parseInt(args[1]);
+                page = val;
+            } catch (NumberFormatException e) {
+                // Ignore the extra argument if it doesn't parse
+            }
         }
         String playerList = "";
         int i = 0;
-        int remainingChars = charsPerLine;
+        int remainingChars = CHARS_PER_LINE;
         for(Player player : Bukkit.getOnlinePlayers()) {
             if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
                 if (remainingChars - player.getName().length() < 0) {
-                    playerList += lineBreak;
-                    remainingChars = charsPerLine;
+                    playerList += LINE_BREAK;
+                    remainingChars = CHARS_PER_LINE;
                 }
                 //Normalize our color in case we have bleed-through
                 playerList += ChatColor.WHITE;
                 //If this isn't a newline lets put in our spacer
-                if (remainingChars != charsPerLine)
+                if (remainingChars != CHARS_PER_LINE)
                     playerList += "  ";
                 //Add the colorized playername to the list
                 playerList += colorize(player);
@@ -230,19 +250,25 @@ public class WhosThere extends JavaPlugin{
                 i++;
             }
         }
+        List<String> lines = Arrays.asList(playerList.split(LINE_BREAK));
+        int totalPages = ((lines.size() + LINES_PER_PAGE - 1) / LINES_PER_PAGE);
+        // Make sure we can display the page we selected
+        if (lines.size() - ((page - 1) * LINES_PER_PAGE) <= 0) {
+            page = totalPages;
+        }
         if (i == 0 && world == null && args.length > 0) {
             sender.sendMessage("No players found with that name.");
         } else if (i == 0 && world != null) {
             sender.sendMessage("No players were found on " + world.getName());
         }  else if (args.length == 0) {
-            String message = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online:" + lineBreak + playerList;
-            sendWrappedText(sender, message);
+            String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online. Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            sendWrappedText(sender, title, lines, page);
         } else if (world != null) {
-            String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ":" + lineBreak + playerList;
-            sendWrappedText(sender, message);
+            String title = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ". Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            sendWrappedText(sender, title, lines, page);
         } else {
-            String message = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria:" + lineBreak + playerList;
-            sendWrappedText(sender, message);
+            String title = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria. Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            sendWrappedText(sender, title, lines, page);
         }
     }
 
@@ -251,19 +277,27 @@ public class WhosThere extends JavaPlugin{
      * @param sender
      * @param args
      */
-    private void whoStaff(CommandSender sender) {
+    private void whoStaff(CommandSender sender, String[] args) {
         String playerList = "";
         int i = 0;
-        int remainingChars = charsPerLine;
-
+        int remainingChars = CHARS_PER_LINE;
+        int page = 1;
+        if (args.length > 1) {
+            try {
+                Integer val = Integer.parseInt(args[1]);
+                page = val;
+            } catch (NumberFormatException e) {
+                
+            }
+        }
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("whosthere.staff")) {
                 if (remainingChars - player.getName().length() < 0) {
-                    playerList += lineBreak;
-                    remainingChars = charsPerLine;
+                    playerList += LINE_BREAK;
+                    remainingChars = CHARS_PER_LINE;
                 }
                 //If this isn't a newline lets put in our spacer
-                if (remainingChars != charsPerLine)
+                if (remainingChars != CHARS_PER_LINE)
                     playerList += "  ";
                 //Add the colorized playername to the list
                 playerList += colorize(player);
@@ -272,11 +306,18 @@ public class WhosThere extends JavaPlugin{
                 playerList += ChatColor.WHITE;
                 i++;
             }
-        } if (i == 0) {
+        } 
+        List<String> lines = Arrays.asList(playerList.split(LINE_BREAK));
+        int totalPages = ((lines.size() + LINES_PER_PAGE - 1) / LINES_PER_PAGE);
+        // Make sure we can display the page we selected
+        if (lines.size() - ((page - 1) * LINES_PER_PAGE) <= 0) {
+            page = totalPages;
+        }
+        if (i == 0) {
             sender.sendMessage("No staff ar currently online!");
         } else {
-            String message = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + ChatColor.WHITE + " staff online:" + lineBreak + playerList;
-            sendWrappedText(sender, message);
+            String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + ChatColor.WHITE + " staff online. Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            sendWrappedText(sender, title, lines, page);
         } 
     }
 
@@ -325,11 +366,11 @@ public class WhosThere extends JavaPlugin{
     private String replaceColors (String message) {
         return message.replaceAll("(?i)&([a-fk0-9])", "\u00A7$1");
     }
-
-
-    private void sendWrappedText(CommandSender sender, String message) {
-        for(String messageLine : message.split(lineBreak)) {
-            sender.sendMessage(messageLine);
+    
+    private void sendWrappedText(CommandSender sender, String header, List<String> lines, int pageNumber) {
+        sender.sendMessage(header);
+        for(int i = pageNumber * LINES_PER_PAGE; i < pageNumber + 1 * LINES_PER_PAGE; i++) {
+            sender.sendMessage(lines.get(i));
         }
     }
 
