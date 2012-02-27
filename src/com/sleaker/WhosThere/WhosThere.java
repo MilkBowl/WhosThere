@@ -234,6 +234,9 @@ public class WhosThere extends JavaPlugin{
         int i = 0;
         int remainingChars = CHARS_PER_LINE;
         for(Player player : Bukkit.getOnlinePlayers()) {
+            if (sender instanceof Player && !((Player) sender).canSee(player)) {
+                continue;
+            }
             if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += LINE_BREAK;
@@ -291,6 +294,9 @@ public class WhosThere extends JavaPlugin{
             }
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (sender instanceof Player && !((Player) sender).canSee(player)) {
+                continue;
+            }
             if (player.hasPermission("whosthere.staff")) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += LINE_BREAK;
