@@ -174,11 +174,17 @@ public class WhosThere extends JavaPlugin{
             }
         }
         if (p != null) {
-            Location pLoc = p.getLocation();
+            if (sender instanceof Player && !((Player) sender).canSee(p)) {
+                if (!checkOfflinePlayer(args[0], sender)) {
+                    sender.sendMessage("No player with name " + args[0] + " was found on the server");
+                }
+                return;
+            }
             sender.sendMessage(replaceColors("&a----  " + colorize(p) + "&a----"));
             if (sender instanceof Player && !has((Player) sender, "whosthere.admin"))  {
                 return;
             }
+            Location pLoc = p.getLocation();
             sender.sendMessage(replaceColors("&aLoc: &d" + pLoc.getBlockX() + "&a, &d" + pLoc.getBlockY() + "&a, &d" + pLoc.getBlockZ() + "&a on: &d" + pLoc.getWorld().getName()));
             long temp = p.getFirstPlayed();
             sender.sendMessage(replaceColors("&aFirst Online: &d" + (temp != 0 ? dateFormat.format(new Date(temp)) : " unknown")));
