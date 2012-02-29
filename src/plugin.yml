@@ -10,6 +10,10 @@ commands:
     whois:
         aliases: [ seen, lastlogin, lastlog ]
         description: get detailed information about a user.
+    findwho:
+        aliases: [ find, fwho, find-who ]
+        description: searches all online players for names with the given string
+        usage: /<command> <string>
 permissions:
   whosthere.whois:
     default: op

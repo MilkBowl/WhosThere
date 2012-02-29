@@ -100,6 +100,20 @@ public class WhosThere extends JavaPlugin{
                 whois(sender, args);
                 return true;
             }
+        } else if (command.getName().equalsIgnoreCase("findwho")) {
+            if (sender instanceof Player) {
+                if (!has((Player) sender, "whosthere.find")) {
+                    sender.sendMessage("You don't have permission to do that.");
+                    return true;
+                }
+            }
+            if (args.length < 1) {
+                sender.sendMessage("You must supply a search string.");
+                return true;
+            } else {
+                findCommand(sender, args);
+                return true;
+            }
         }
         return false;
     }
@@ -207,6 +221,53 @@ public class WhosThere extends JavaPlugin{
         }
     }
 
+    private void findCommand(CommandSender sender, String[] args) {
+        int page = 0;
+        if (args.length > 1) {
+            try {
+                Integer val = Integer.parseInt(args[1]);
+                page = val - 1;
+            } catch (NumberFormatException e) {
+                // Ignore the extra argument if it doesn't parse
+            }
+        }
+        String playerList = "";
+        int i = 0;
+        int remainingChars = CHARS_PER_LINE;
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if (sender instanceof Player && !((Player) sender).canSee(player)) {
+                continue;
+            }
+            if (player.getName().toLowerCase().contains(args[0].toLowerCase())) {
+                if (remainingChars - player.getName().length() < 0) {
+                    playerList += LINE_BREAK;
+                    remainingChars = CHARS_PER_LINE;
+                }
+                //Normalize our color in case we have bleed-through
+                playerList += ChatColor.WHITE;
+                //If this isn't a newline lets put in our spacer
+                if (remainingChars != CHARS_PER_LINE) {
+                    playerList += "  ";
+                }
+                //Add the colorized playername to the list
+                playerList += colorize(player);
+                remainingChars -= (player.getName().length() + 2);
+                i++;
+            }
+        }
+        List<String> lines = Arrays.asList(playerList.split(LINE_BREAK));
+        int totalPages = lines.size() % LINES_PER_PAGE;
+        // Make sure we can display the page we selected
+        if (page >= totalPages || page < 0) {
+            page = 0;
+        }
+        if (i == 0 ) {
+            sender.sendMessage("No players found with that name.");
+        } else {
+            String title = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria. Showing page " + ChatColor.BLUE + (page + 1) + "/" + (totalPages + 1);
+            sendWrappedText(sender, title, lines, page);
+        }
+    }
     /*
      * Sends a limited who list to the command sender
      */
@@ -231,7 +292,7 @@ public class WhosThere extends JavaPlugin{
         if (args.length > 1) {
             try {
                 Integer val = Integer.parseInt(args[1]);
-                page = val;
+                page = val - 1;
             } catch (NumberFormatException e) {
                 // Ignore the extra argument if it doesn't parse
             }
@@ -243,7 +304,7 @@ public class WhosThere extends JavaPlugin{
             if (sender instanceof Player && !((Player) sender).canSee(player)) {
                 continue;
             }
-            if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world)) || (world == null && player.getName().contains(args[0]))) {
+            if ((world == null && args.length == 0) || (world != null && player.getWorld().equals(world))) {
                 if (remainingChars - player.getName().length() < 0) {
                     playerList += LINE_BREAK;
                     remainingChars = CHARS_PER_LINE;
@@ -251,8 +312,9 @@ public class WhosThere extends JavaPlugin{
                 //Normalize our color in case we have bleed-through
                 playerList += ChatColor.WHITE;
                 //If this isn't a newline lets put in our spacer
-                if (remainingChars != CHARS_PER_LINE)
+                if (remainingChars != CHARS_PER_LINE) {
                     playerList += "  ";
+                }
                 //Add the colorized playername to the list
                 playerList += colorize(player);
                 remainingChars -= (player.getName().length() + 2);
@@ -265,20 +327,15 @@ public class WhosThere extends JavaPlugin{
         if (page >= totalPages || page < 0) {
             page = 0;
         }
-        if (i == 0 && world == null && args.length > 0) {
-            sender.sendMessage("No players found with that name.");
-        } else if (i == 0 && world != null) {
+        if (i == 0 && world != null) {
             sender.sendMessage("No players were found on " + world.getName());
-        }  else if (args.length == 0) {
-            String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online. Showing page " + ChatColor.BLUE + page + "/" + totalPages;
-            sendWrappedText(sender, title, lines, page);
         } else if (world != null) {
-            String title = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ". Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            String title = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players on " + world.getName() + ". Showing page " + ChatColor.BLUE + (page + 1) + "/" + (totalPages + 1);
             sendWrappedText(sender, title, lines, page);
         } else {
-            String title = ChatColor.WHITE + "Found " + ChatColor.BLUE + i + ChatColor.WHITE + " players matching your criteria. Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + "/" + this.getServer().getMaxPlayers() + ChatColor.WHITE + " players online. Showing page " + ChatColor.BLUE + (page + 1) + "/" + (totalPages + 1);
             sendWrappedText(sender, title, lines, page);
-        }
+        } 
     }
 
     /**
@@ -309,8 +366,9 @@ public class WhosThere extends JavaPlugin{
                     remainingChars = CHARS_PER_LINE;
                 }
                 //If this isn't a newline lets put in our spacer
-                if (remainingChars != CHARS_PER_LINE)
+                if (remainingChars != CHARS_PER_LINE) {
                     playerList += "  ";
+                }
                 //Add the colorized playername to the list
                 playerList += colorize(player);
                 remainingChars -= (player.getName().length() + 2);
@@ -328,7 +386,7 @@ public class WhosThere extends JavaPlugin{
         if (i == 0) {
             sender.sendMessage("No staff ar currently online!");
         } else {
-            String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + ChatColor.WHITE + " staff online. Showing page " + ChatColor.BLUE + page + "/" + totalPages;
+            String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + ChatColor.WHITE + " staff online. Showing page " + ChatColor.BLUE + (page + 1) + "/" + (totalPages + 1);
             sendWrappedText(sender, title, lines, page);
         } 
     }
