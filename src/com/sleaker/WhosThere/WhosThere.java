@@ -212,7 +212,7 @@ public class WhosThere extends JavaPlugin{
      */
     private void whoCommand(CommandSender sender, String[] args) {
         World world = null;
-        int page = 1;
+        int page = 0;
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("staff")) {
                 whoStaff(sender, args);
@@ -222,7 +222,7 @@ public class WhosThere extends JavaPlugin{
             if (world == null) {
                 try {
                     Integer val = Integer.parseInt(args[0]);
-                    page = val;
+                    page = val - 1;
                 } catch (NumberFormatException e) {
                     // Ignore an exception here
                 }
@@ -260,10 +260,10 @@ public class WhosThere extends JavaPlugin{
             }
         }
         List<String> lines = Arrays.asList(playerList.split(LINE_BREAK));
-        int totalPages = ((lines.size() + LINES_PER_PAGE - 1) / LINES_PER_PAGE);
+        int totalPages = lines.size() % LINES_PER_PAGE;
         // Make sure we can display the page we selected
-        if (lines.size() - ((page - 1) * LINES_PER_PAGE) <= 0) {
-            page = totalPages;
+        if (page >= totalPages || page < 0) {
+            page = 0;
         }
         if (i == 0 && world == null && args.length > 0) {
             sender.sendMessage("No players found with that name.");
@@ -290,11 +290,11 @@ public class WhosThere extends JavaPlugin{
         String playerList = "";
         int i = 0;
         int remainingChars = CHARS_PER_LINE;
-        int page = 1;
+        int page = 0;
         if (args.length > 1) {
             try {
                 Integer val = Integer.parseInt(args[1]);
-                page = val;
+                page = val - 1;
             } catch (NumberFormatException e) {
                 
             }
@@ -320,10 +320,10 @@ public class WhosThere extends JavaPlugin{
             }
         } 
         List<String> lines = Arrays.asList(playerList.split(LINE_BREAK));
-        int totalPages = ((lines.size() + LINES_PER_PAGE - 1) / LINES_PER_PAGE);
+        int totalPages = lines.size() % LINES_PER_PAGE;
         // Make sure we can display the page we selected
-        if (lines.size() - ((page - 1) * LINES_PER_PAGE) <= 0) {
-            page = totalPages;
+        if (page >= totalPages || page < 0) {
+            page = 0;
         }
         if (i == 0) {
             sender.sendMessage("No staff ar currently online!");
@@ -381,7 +381,11 @@ public class WhosThere extends JavaPlugin{
     
     private void sendWrappedText(CommandSender sender, String header, List<String> lines, int pageNumber) {
         sender.sendMessage(header);
-        for(int i = pageNumber * LINES_PER_PAGE; i < pageNumber + 1 * LINES_PER_PAGE; i++) {
+        int end = (pageNumber + 1) * LINES_PER_PAGE;
+        if (end > lines.size()) {
+            end = lines.size();
+        }
+        for(int i = pageNumber * LINES_PER_PAGE; i < end; i++) {
             sender.sendMessage(lines.get(i));
         }
     }
