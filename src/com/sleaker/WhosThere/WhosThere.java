@@ -384,7 +384,7 @@ public class WhosThere extends JavaPlugin{
             page = 0;
         }
         if (i == 0) {
-            sender.sendMessage("No staff ar currently online!");
+            sender.sendMessage("No staff are currently online!");
         } else {
             String title = ChatColor.WHITE + "There " + (i > 1 ? "are " : "is ") + ChatColor.BLUE + i + ChatColor.WHITE + " staff online. Showing page " + ChatColor.BLUE + (page + 1) + "/" + (totalPages + 1);
             sendWrappedText(sender, title, lines, page);
