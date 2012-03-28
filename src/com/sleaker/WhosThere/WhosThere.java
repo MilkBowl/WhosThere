@@ -434,7 +434,7 @@ public class WhosThere extends JavaPlugin{
      * @return
      */
     private String replaceColors (String message) {
-        return message.replaceAll("(?i)&([a-fk0-9])", "\u00A7$1");
+        return message.replaceAll("(?i)&([a-fklmno0-9])", "\u00A7$1");
     }
     
     private void sendWrappedText(CommandSender sender, String header, List<String> lines, int pageNumber) {
