@@ -326,6 +326,9 @@ public class WhosThere extends JavaPlugin{
         // Make sure we can display the page we selected
         if (page >= totalPages || page < 0) {
             page = 0;
+        } else if (i == 0) {
+            page = 0;
+            totalPages = 1;
         }
         if (i == 0 && world != null) {
             sender.sendMessage("No players were found on " + world.getName());
@@ -382,7 +385,7 @@ public class WhosThere extends JavaPlugin{
         // Make sure we can display the page we selected
         if (page >= totalPages || page < 0) {
             page = 0;
-        }
+        }        
         if (i == 0) {
             sender.sendMessage("No staff are currently online!");
         } else {
