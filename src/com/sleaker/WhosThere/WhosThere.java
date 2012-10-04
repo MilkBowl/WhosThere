@@ -114,6 +114,17 @@ public class WhosThere extends JavaPlugin{
                 findCommand(sender, args);
                 return true;
             }
+        } else if (command.getName().equalsIgnoreCase("staff")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (!has(player, "whosthere.who")) {
+                    player.sendMessage("You don't have permission to do that.");
+                    return true;
+                }
+            } 
+            //If this is Console, or a Player with Administrate priveledges they will see this message
+            whoStaff(sender, args);
+            return true;
         }
         return false;
     }
